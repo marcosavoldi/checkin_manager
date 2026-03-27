@@ -32,15 +32,6 @@ const SOURCE_LABELS: Record<BookingSource, string> = {
 
 type BookingEventCompat = Booking;
 
-function getHighlightedDates(bookings: Booking[]) {
-  const days = new Set<string>();
-  for (const b of bookings) {
-    days.add(dayjs(b.checkIn).format('YYYY-MM-DD'));
-    days.add(dayjs(b.checkOut).format('YYYY-MM-DD'));
-  }
-  return days;
-}
-
 function getBookingsForDay(bookings: Booking[], date: Date) {
   const d = dayjs(date);
   return bookings.filter(b =>
@@ -180,12 +171,9 @@ export default function Dashboard() {
             <Calendar
               locale="it"
               size="md"
-              styles={{
-                calendar: { width: '100%' },
-                month: { width: '100%' }
-              }}
+              style={{ width: '100%' }}
               renderDay={(date) => {
-                const d = new Date(date as unknown as Date);
+                const d = dayjs(date).toDate();
                 const isCheckIn = bookings.some(b => dayjs(d).isSame(dayjs(b.checkIn), 'day'));
                 const isCheckOut = bookings.some(b => dayjs(d).isSame(dayjs(b.checkOut), 'day'));
                 const isToday = dayjs(d).isSame(dayjs(), 'day');
