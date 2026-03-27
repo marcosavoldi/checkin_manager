@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Collezione Utenti
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+      allow read, write: if isAdmin();
+    }
+    
+    // Collezione Prenotazioni (gestite dall'Admin)
+    match /bookings/{bookingId} {
+      // Tutti gli autenticati possono leggere
+      allow read: if isAuthenticated();
+      // Solo l'Admin può creare, modificare o eliminare
+      allow write: if isAdmin();
+    }
+    
+    // Collezione Note sulle Prenotazioni
+    match /notes/{noteId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
