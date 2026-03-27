@@ -33,7 +33,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         <Group h="100%" px="md" gap="sm">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Image
-            src="/Logo.jpg"
+            src={`${import.meta.env.BASE_URL}Logo.jpg`}
             h={44}
             w="auto"
             maw={160}
