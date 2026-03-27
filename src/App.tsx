@@ -33,7 +33,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         <Group h="100%" px="md" gap="sm">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Image
-            src={`${import.meta.env.BASE_URL}Logo.jpg`}
+            src="/Logo.jpg"
             h={44}
             w="auto"
             maw={160}
@@ -67,7 +67,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <BrowserRouter>
         <MainLayout>
           <Routes>
             <Route path="/login" element={<Login />} />
