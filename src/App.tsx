@@ -1,7 +1,7 @@
-import { AppShell, Burger, Group, Container, NavLink, Image } from '@mantine/core';
+import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { IconLayoutDashboard, IconCalendarPlus } from '@tabler/icons-react';
+import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon } from '@tabler/icons-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -13,6 +13,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   
   if (!user || loading) return <>{children}</>;
 
@@ -30,15 +32,31 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md" gap="sm">
-          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <Image
-            src="/Logo.jpg"
-            h={44}
-            w="auto"
-            maw={160}
-            fit="contain"
-          />
+        <Group h="100%" px="md" justify="space-between" align="center">
+          <Group gap="sm">
+            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            <Image
+              src="/Logo.jpg"
+              h={44}
+              w="auto"
+              maw={160}
+              fit="contain"
+            />
+          </Group>
+          
+          <ActionIcon
+            onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
+            variant="default"
+            size="lg"
+            aria-label="Toggle color scheme"
+            radius="md"
+          >
+            {computedColorScheme === 'light' ? (
+              <IconMoon stroke={1.5} size={20} />
+            ) : (
+              <IconSun stroke={1.5} size={20} />
+            )}
+          </ActionIcon>
         </Group>
       </AppShell.Header>
 

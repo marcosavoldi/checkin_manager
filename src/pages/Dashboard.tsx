@@ -76,12 +76,13 @@ export default function Dashboard() {
   if (loading) return <Loader message="Caricamento prenotazioni..." />;
   if (error) return <ErrorState message={error} onRetry={loadData} />;
 
-  const highlightedDays = getHighlightedDates(bookings);
   const dayBookings = selectedDay ? getBookingsForDay(bookings, selectedDay) : [];
 
   const handleDayClick = (date: Date) => {
-    const key = dayjs(date).format('YYYY-MM-DD');
-    if (highlightedDays.has(key)) {
+    const isCheckIn = bookings.some(b => dayjs(date).isSame(dayjs(b.checkIn), 'day'));
+    const isCheckOut = bookings.some(b => dayjs(date).isSame(dayjs(b.checkOut), 'day'));
+    
+    if (isCheckIn || isCheckOut) {
       setSelectedDay(date);
       openDayModal();
     }
@@ -107,9 +108,9 @@ export default function Dashboard() {
 
       {/* ── Tab switcher ───────────────────────── */}
       <Tabs value={view} onChange={v => setView(v ?? 'cards')} mb="md">
-        <Tabs.List>
-          <Tabs.Tab value="cards" leftSection={<IconLayoutGrid size={14} />}>Lista</Tabs.Tab>
-          <Tabs.Tab value="calendar" leftSection={<IconCalendar size={14} />}>Calendario</Tabs.Tab>
+        <Tabs.List grow>
+          <Tabs.Tab value="cards" leftSection={<IconLayoutGrid size={14} />} style={{ flex: 1 }}>Lista</Tabs.Tab>
+          <Tabs.Tab value="calendar" leftSection={<IconCalendar size={14} />} style={{ flex: 1 }}>Calendario</Tabs.Tab>
         </Tabs.List>
       </Tabs>
 
@@ -174,52 +175,68 @@ export default function Dashboard() {
 
       {/* ── VISTA CALENDARIO ───────────────────── */}
       {view === 'calendar' && (
-        <Box style={{ overflowX: 'auto' }}>
-          <Box style={{ maxWidth: 360, margin: '0 auto' }}>
+        <Box>
+          <Box style={{ maxWidth: 450, margin: '0 auto' }}>
             <Calendar
               locale="it"
-              size="sm"
+              size="md"
+              styles={{
+                calendar: { width: '100%' },
+                month: { width: '100%' }
+              }}
               renderDay={(date) => {
                 const d = new Date(date as unknown as Date);
-                const key = dayjs(d).format('YYYY-MM-DD');
-                const hasEvent = highlightedDays.has(key);
+                const isCheckIn = bookings.some(b => dayjs(d).isSame(dayjs(b.checkIn), 'day'));
+                const isCheckOut = bookings.some(b => dayjs(d).isSame(dayjs(b.checkOut), 'day'));
                 const isToday = dayjs(d).isSame(dayjs(), 'day');
+                
                 return (
-                  <Box
+                  <Stack
+                    gap={2}
+                    align="center"
+                    justify="center"
                     style={{
                       position: 'relative',
                       width: '100%',
                       height: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: hasEvent ? 'pointer' : 'default',
-                      borderRadius: 4,
+                      cursor: (isCheckIn || isCheckOut) ? 'pointer' : 'default',
+                      borderRadius: 8,
                       fontWeight: isToday ? 700 : undefined,
                       background: isToday ? 'var(--mantine-color-violet-light)' : undefined,
+                      padding: 4
                     }}
                     onClick={() => handleDayClick(d)}
                   >
-                    {d.getDate()}
-                    {hasEvent && (
-                      <Box
-                        style={{
-                          position: 'absolute',
-                          bottom: 1,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: 4,
-                          height: 4,
-                          borderRadius: '50%',
-                          background: 'var(--mantine-color-violet-6)',
-                        }}
-                      />
-                    )}
-                  </Box>
+                    <Text size="sm" fw={isToday ? 700 : 500}>{d.getDate()}</Text>
+                    <Group gap={2} justify="center" h={4} w="100%" wrap="nowrap">
+                      {isCheckIn && (
+                        <Box
+                          style={{
+                            height: 3,
+                            flex: 1,
+                            maxWidth: 12,
+                            borderRadius: 2,
+                            background: 'var(--mantine-color-green-6)',
+                          }}
+                        />
+                      )}
+                      {isCheckOut && (
+                        <Box
+                          style={{
+                            height: 3,
+                            flex: 1,
+                            maxWidth: 12,
+                            borderRadius: 2,
+                            background: 'var(--mantine-color-red-6)',
+                          }}
+                        />
+                      )}
+                    </Group>
+                  </Stack>
                 );
               }}
             />
-            <Text ta="center" size="xs" c="dimmed" mt="sm">Clicca su un giorno evidenziato per vedere i movimenti</Text>
+            <Text ta="center" size="xs" c="dimmed" mt="md">Clicca su un giorno con barre colorate per vedere i dettagli</Text>
           </Box>
         </Box>
       )}
