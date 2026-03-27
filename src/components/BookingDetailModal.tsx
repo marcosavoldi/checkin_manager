@@ -36,8 +36,17 @@ export default function BookingDetailModal({ opened, onClose, booking }: Props) 
       onClose={onClose}
       title={
         <Group gap="xs">
-          <Badge color={SOURCE_COLORS[source]} size="sm">{SOURCE_LABELS[source]}</Badge>
-          <Text fw={600} size="sm">{booking.guestName || SOURCE_LABELS[source]}</Text>
+          {isAdmin ? (
+            <>
+              <Badge color={SOURCE_COLORS[source]} size="sm">{SOURCE_LABELS[source]}</Badge>
+              <Text fw={600} size="sm">{booking.guestName || 'Ospite'}</Text>
+            </>
+          ) : (
+            <>
+              <Badge color="gray" size="sm">Prenotazione</Badge>
+              <Text fw={600} size="sm">Dettagli Staff</Text>
+            </>
+          )}
         </Group>
       }
       size="md"
@@ -45,6 +54,21 @@ export default function BookingDetailModal({ opened, onClose, booking }: Props) 
       radius="lg"
     >
       <Stack gap="md">
+        {/* Ospiti */}
+        <Paper withBorder p="sm" radius="md" style={{ borderLeft: '4px solid var(--mantine-color-teal-6)' }}>
+          <Group justify="space-between">
+            <Group gap="xs">
+              <ThemeIcon color="teal" variant="light" size="sm">
+                <IconUsers size={14} />
+              </ThemeIcon>
+              <Text size="sm" fw={600}>Ospiti</Text>
+            </Group>
+            <Text size="sm" fw={700}>
+              {booking.adults} Adulti {booking.children > 0 && `+ ${booking.children} Bambini`}
+            </Text>
+          </Group>
+        </Paper>
+
         {/* Date */}
         <Group grow>
           <Paper withBorder p="sm" radius="md">

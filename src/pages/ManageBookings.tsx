@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Title, Button, Group, Stack, Text, Card, Badge,
   Modal, TextInput, Textarea, Select, ActionIcon, Tooltip,
-  Box, Divider, ThemeIcon, Paper
+  Box, Divider, ThemeIcon, Paper, NumberInput
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
@@ -41,7 +41,9 @@ const EMPTY_FORM = {
   guestName: '',
   notes: '',
   staffNote: '',
-  adminNote: ''
+  adminNote: '',
+  adults: 2,
+  children: 0
 };
 
 export default function ManageBookings() {
@@ -74,7 +76,9 @@ export default function ManageBookings() {
       source: b.source, guestName: b.guestName || '',
       notes: b.notes || '',
       staffNote: b.staffNote || '',
-      adminNote: b.adminNote || ''
+      adminNote: b.adminNote || '',
+      adults: b.adults || 0,
+      children: b.children || 0
     });
     open();
   };
@@ -90,7 +94,9 @@ export default function ManageBookings() {
         guestName: form.guestName,
         notes: form.notes,
         staffNote: form.staffNote,
-        adminNote: form.adminNote
+        adminNote: form.adminNote,
+        adults: form.adults,
+        children: form.children
       };
       if (editingId) await updateBooking(editingId, payload);
       else await addBooking(payload, user!.uid);
@@ -145,6 +151,11 @@ export default function ManageBookings() {
                       {SOURCE_LABELS[b.source]}
                     </Badge>
                     {b.guestName && <Text fw={600} size="sm">{b.guestName}</Text>}
+                    <Group gap={4} mt={3}>
+                      <Badge variant="transparent" color="gray" size="xs" p={0}>
+                        {b.adults} Adulti {b.children > 0 && `, ${b.children} Bambini`}
+                      </Badge>
+                    </Group>
                   </Box>
 
                   <Divider orientation="vertical" />
@@ -256,6 +267,20 @@ export default function ManageBookings() {
             autosize
             minRows={2}
           />
+          <Group grow>
+            <NumberInput
+              label="Adulti"
+              min={1}
+              value={form.adults}
+              onChange={(v: string | number) => setForm(f => ({ ...f, adults: Number(v) || 0 }))}
+            />
+            <NumberInput
+              label="Bambini"
+              min={0}
+              value={form.children}
+              onChange={(v: string | number) => setForm(f => ({ ...f, children: Number(v) || 0 }))}
+            />
+          </Group>
           <Textarea
             label="🔒 Nota Admin (visibile solo a te)"
             placeholder="es. Codice cassaforte: 1234, WiFi password..."

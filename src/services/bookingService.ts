@@ -24,6 +24,8 @@ export interface Booking {
   notes?: string;       // nota rapida legacy sulla card
   staffNote?: string;   // nota visibile a staff e admin
   adminNote?: string;   // nota visibile solo all'admin
+  adults: number;       // numero adulti
+  children: number;     // numero bambini
   createdAt?: any;
   createdBy?: string;
 }
@@ -54,6 +56,8 @@ export async function fetchUpcomingBookings(): Promise<Booking[]> {
       notes: data.notes || '',
       staffNote: data.staffNote || '',
       adminNote: data.adminNote || '',
+      adults: data.adults || 0,
+      children: data.children || 0,
       createdAt: data.createdAt,
       createdBy: data.createdBy
     };

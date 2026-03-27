@@ -67,6 +67,7 @@ export default function Dashboard() {
   if (loading) return <Loader message="Caricamento prenotazioni..." />;
   if (error) return <ErrorState message={error} onRetry={loadData} />;
 
+  const isAdmin = user?.appRole === 'admin';
   const dayBookings = selectedDay ? getBookingsForDay(bookings, selectedDay) : [];
 
   const handleDayClick = (date: Date) => {
@@ -87,8 +88,8 @@ export default function Dashboard() {
           <Avatar src={user?.photoURL} size="sm" radius="xl" />
           <div>
             <Title order={5} fw={700} lh={1.2}>{user?.displayName}</Title>
-            <Text size="xs" c={user?.appRole === 'admin' ? 'violet' : 'dimmed'} fw={500}>
-              {user?.appRole === 'admin' ? '✦ Admin' : 'Staff'}
+            <Text size="xs" c={isAdmin ? 'violet' : 'dimmed'} fw={500}>
+              {isAdmin ? '✦ Admin' : 'Staff'}
             </Text>
           </div>
         </Group>
@@ -118,17 +119,25 @@ export default function Dashboard() {
               <Grid.Col span={{ base: 12, sm: 6, lg: 4 }} key={b.id}>
                 <Card shadow="xs" padding="md" radius="lg" withBorder h="100%">
                   <Group justify="space-between" mb="sm">
-                    <Badge color={SOURCE_COLORS[b.source]} variant="light" size="sm" radius="sm">
-                      {SOURCE_LABELS[b.source]}
-                    </Badge>
-                    {b.guestName && (
-                      <Text size="xs" c="dimmed" fw={500} truncate style={{ maxWidth: 130 }}>
-                        {b.guestName}
-                      </Text>
+                    {isAdmin ? (
+                      <Badge color={SOURCE_COLORS[b.source]} variant="light" size="sm" radius="sm">
+                        {SOURCE_LABELS[b.source]}
+                      </Badge>
+                    ) : (
+                      <Badge color="gray" variant="light" size="sm" radius="sm">
+                        Prenotazione
+                      </Badge>
                     )}
+                    <Text size="xs" c="dimmed" fw={500}>
+                      {b.adults}A {b.children > 0 && `+ ${b.children}B`}
+                    </Text>
                   </Group>
 
                   <Stack gap={6} mb="md">
+                    <Text size="sm" fw={700} truncate>
+                      {isAdmin ? (b.guestName || 'Ospite') : 'Dettagli Prenotazione'}
+                    </Text>
+                    
                     <Group justify="space-between" align="center">
                       <Group gap={6}>
                         <ThemeIcon color="green" variant="light" size="sm" radius="sm">
