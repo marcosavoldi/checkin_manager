@@ -39,7 +39,6 @@ const EMPTY_FORM = {
   checkOut: null as DateValue,
   source: 'airbnb' as BookingSource,
   guestName: '',
-  notes: '',
   staffNote: '',
   adminNote: '',
   adults: 2,
@@ -74,7 +73,6 @@ export default function ManageBookings() {
     setForm({
       checkIn: b.checkIn, checkOut: b.checkOut,
       source: b.source, guestName: b.guestName || '',
-      notes: b.notes || '',
       staffNote: b.staffNote || '',
       adminNote: b.adminNote || '',
       adults: b.adults || 0,
@@ -92,7 +90,6 @@ export default function ManageBookings() {
       const payload = {
         checkIn, checkOut, source: form.source,
         guestName: form.guestName,
-        notes: form.notes,
         staffNote: form.staffNote,
         adminNote: form.adminNote,
         adults: form.adults,
@@ -181,10 +178,6 @@ export default function ManageBookings() {
                       </div>
                     </Group>
                   </Group>
-
-                  {b.notes && (
-                    <Text size="xs" c="dimmed" style={{ flex: 1, fontStyle: 'italic' }}>{b.notes}</Text>
-                  )}
                 </Group>
 
                 {/* Azioni */}
@@ -250,14 +243,6 @@ export default function ManageBookings() {
             placeholder="es. Mario Rossi"
             value={form.guestName}
             onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, guestName: v })); }}
-          />
-          <Textarea
-            label="Nota rapida sulla card (opzionale)"
-            placeholder="es. Check-in serale, ore 22:30"
-            value={form.notes}
-            onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, notes: v })); }}
-            autosize
-            minRows={2}
           />
           <Textarea
             label="🟦 Nota Staff (visibile a tutto lo staff)"

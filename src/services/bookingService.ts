@@ -21,7 +21,6 @@ export interface Booking {
   checkOut: Date;
   source: BookingSource;
   guestName?: string;
-  notes?: string;       // nota rapida legacy sulla card
   staffNote?: string;   // nota visibile a staff e admin
   adminNote?: string;   // nota visibile solo all'admin
   adults: number;       // numero adulti
@@ -53,7 +52,6 @@ export async function fetchUpcomingBookings(): Promise<Booking[]> {
       checkOut: (data.checkOut as Timestamp).toDate(),
       source: data.source as BookingSource,
       guestName: data.guestName || '',
-      notes: data.notes || '',
       staffNote: data.staffNote || '',
       adminNote: data.adminNote || '',
       adults: data.adults || 0,

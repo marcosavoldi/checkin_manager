@@ -1,4 +1,4 @@
-import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme } from '@mantine/core';
+import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Text as MantineText } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon } from '@tabler/icons-react';
@@ -6,7 +6,16 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ManageBookings from './pages/ManageBookings';
-import ProtectedRoute from './components/ProtectedRoute';
+
+function ProtectedRoute({ children, adminOnly }: { children: React.ReactNode, adminOnly?: boolean }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Login />;
+  if (adminOnly && user.appRole !== 'admin') {
+    return <Dashboard />;
+  }
+  return <>{children}</>;
+}
 
 function MainLayout({ children }: { children: React.ReactNode }) {
   const [opened, { toggle, close }] = useDisclosure();
@@ -27,8 +36,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <AppShell
-      header={{ height: 60 }}
-      navbar={{ width: 250, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      header={{ height: 64 }}
+      navbar={{ width: 280, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
       <AppShell.Header>
@@ -36,19 +45,18 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           <Group gap="sm">
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
             <Image
-              src="/Logo.jpg"
+              src={computedColorScheme === 'light' ? '/Logo.jpg' : '/Logo1.png'}
               h={44}
               w="auto"
-              maw={160}
               fit="contain"
             />
+            <MantineText fw={700} size="lg" visibleFrom="xs">Lazzaretto City Walk</MantineText>
           </Group>
           
           <ActionIcon
             onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
             variant="default"
             size="lg"
-            aria-label="Toggle color scheme"
             radius="md"
           >
             {computedColorScheme === 'light' ? (
@@ -68,13 +76,13 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             leftSection={item.icon}
             active={location.pathname === item.path}
             onClick={() => { navigate(item.path); close(); }}
-            style={{ borderRadius: 6 }}
+            style={{ borderRadius: 8, marginBottom: 4 }}
           />
         ))}
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <Container fluid>
+        <Container size="xl" py="md">
           {children}
         </Container>
       </AppShell.Main>
@@ -86,13 +94,17 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <MainLayout>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/gestione" element={<ProtectedRoute adminOnly><ManageBookings /></ProtectedRoute>} />
-          </Routes>
-        </MainLayout>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/*" element={
+            <MainLayout>
+              <Routes>
+                <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/gestione" element={<ProtectedRoute adminOnly><ManageBookings /></ProtectedRoute>} />
+              </Routes>
+            </MainLayout>
+          } />
+        </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
