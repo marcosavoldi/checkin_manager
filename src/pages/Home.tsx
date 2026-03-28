@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider } from '@mantine/core';
 import { IconCalendarCheck, IconCalendarStats, IconDoorExit, IconLogin, IconLogout } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
-import { fetchUpcomingBookings, type Booking } from '../services/bookingService';
+import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
+import { getLinenInventory, subtractLinen, type LinenInventory } from '../services/inventoryService';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import weekday from 'dayjs/plugin/weekday';
@@ -16,15 +17,35 @@ export default function Home() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inventory, setInventory] = useState<LinenInventory | null>(null);
 
   const isAdmin = user?.appRole === 'admin';
 
-  useEffect(() => {
-    fetchUpcomingBookings().then(data => {
-      setBookings(data);
+  const loadAll = async () => {
+    setLoading(true);
+    try {
+      const [bkngs, inv] = await Promise.all([
+        fetchUpcomingBookings(),
+        getLinenInventory()
+      ]);
+      
+      // Sincronizza consumi se admin
+      if (bkngs.length > 0) {
+        await processLinenConsumption(bkngs, subtractLinen);
+        // Ricarica inventario se cambiato
+        const updatedInv = await getLinenInventory();
+        setInventory(updatedInv);
+      } else {
+        setInventory(inv);
+      }
+      
+      setBookings(bkngs);
+    } finally {
       setLoading(false);
-    });
-  }, []);
+    }
+  };
+
+  useEffect(() => { loadAll(); }, []);
 
   if (loading) return <Text c="dimmed" ta="center" py="xl">Caricamento widget...</Text>;
 
@@ -131,7 +152,40 @@ export default function Home() {
              </Grid.Col>
            </Grid>
 
-           <Divider label="Tracker Settimanale Admin" labelPosition="center" color="gray.2" />
+            <Divider label="Tracker Settimanale Admin" labelPosition="center" color="gray.2" />
+
+            {inventory && (
+              <Grid gutter="md">
+                <Grid.Col span={12}>
+                  <Paper withBorder radius="lg" p="md" shadow="sm">
+                    <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb="md">Inventario Biancheria Pulita</Text>
+                    <Group grow gap="xl">
+                      <Group gap="md">
+                        <ThemeIcon size={44} radius="md" color="blue" variant="light">
+                          <IconLogout size={24} />
+                        </ThemeIcon>
+                        <div>
+                          <Text size="xs" c="dimmed">Kit Letto</Text>
+                          <Title order={3}>{inventory.bedKits}</Title>
+                        </div>
+                      </Group>
+                      <Group gap="md">
+                        <ThemeIcon size={44} radius="md" color="teal" variant="light">
+                          <IconLogin size={24} />
+                        </ThemeIcon>
+                        <div>
+                          <Text size="xs" c="dimmed">Kit Asciugamani</Text>
+                          <Title order={3}>{inventory.towelKits}</Title>
+                        </div>
+                      </Group>
+                    </Group>
+                    <Text size="10px" c="dimmed" mt="xs" ta="right">
+                      Aggiornato: {dayjs(inventory.lastUpdated?.toDate ? inventory.lastUpdated.toDate() : inventory.lastUpdated).format('HH:mm [del] DD MMM')}
+                    </Text>
+                  </Paper>
+                </Grid.Col>
+              </Grid>
+            )}
 
            <Grid gutter="md">
              {/* Prossimi Eventi Admin */}

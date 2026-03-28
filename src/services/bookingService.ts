@@ -27,6 +27,7 @@ export interface Booking {
   children: number;     // numero bambini
   createdAt?: any;
   createdBy?: string;
+  linenAccounted?: boolean; // Se i kit sono già stati detratti dall'inventario
 }
 
 const COLLECTION = 'bookings';
@@ -58,7 +59,8 @@ export async function fetchUpcomingBookings(): Promise<Booking[]> {
       adults: data.adults || 0,
       children: data.children || 0,
       createdAt: data.createdAt,
-      createdBy: data.createdBy
+      createdBy: data.createdBy,
+      linenAccounted: data.linenAccounted || false
     };
   });
 }
@@ -85,4 +87,37 @@ export async function updateBooking(id: string, booking: Partial<Omit<Booking, '
 export async function deleteBooking(id: string) {
   const ref = doc(db, COLLECTION, id);
   return await deleteDoc(ref);
+}
+
+/**
+ * Controlla le prenotazioni che iniziano oggi o nel passato 
+ * e detrae i kit dall'inventario se non già fatto.
+ */
+export async function processLinenConsumption(bookings: Booking[], subtractFn: (beds: number, towels: number) => Promise<void>) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const pending = bookings.filter(b => 
+    !b.linenAccounted && 
+    (new Date(b.checkIn) <= today)
+  );
+
+  if (pending.length === 0) return;
+
+  for (const b of pending) {
+    try {
+      // 1. Sottrai dall'inventario
+      const towels = b.adults || 0;
+      await subtractFn(1, towels);
+
+      // 2. Segna come contabilizzato
+      const ref = doc(db, COLLECTION, b.id!);
+      await updateDoc(ref, { linenAccounted: true });
+      
+      // Aggiorna l'oggetto in locale
+      b.linenAccounted = true;
+    } catch (err) {
+      console.error(`Errore nel processare biancheria per ${b.id}:`, err);
+    }
+  }
 }

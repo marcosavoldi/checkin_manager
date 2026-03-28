@@ -7,7 +7,7 @@ import {
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout, IconShirt, IconPlus, IconCheck } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import {
   fetchUpcomingBookings,
@@ -17,6 +17,7 @@ import {
   type Booking,
   type BookingSource
 } from '../services/bookingService';
+import { getLinenInventory, addCleanLinen, setLinenInventory, type LinenInventory } from '../services/inventoryService';
 import dayjs from 'dayjs';
 import 'dayjs/locale/it';
 
@@ -53,12 +54,22 @@ export default function ManageBookings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [opened, { open, close }] = useDisclosure(false);
+  
+  // State per inventario
+  const [inventory, setInventory] = useState<LinenInventory | null>(null);
+  const [invLoading, setInvLoading] = useState(false);
+  const [addBeds, setAddBeds] = useState<number | string>(0);
+  const [addTowels, setAddTowels] = useState<number | string>(0);
 
   const load = async () => {
     setLoading(true);
     try {
-      const data = await fetchUpcomingBookings();
-      setBookings(data);
+      const [bkngs, inv] = await Promise.all([
+        fetchUpcomingBookings(),
+        getLinenInventory()
+      ]);
+      setBookings(bkngs);
+      setInventory(inv);
     } finally {
       setLoading(false);
     }
@@ -104,6 +115,35 @@ export default function ManageBookings() {
     }
   };
 
+  const handleRestock = async () => {
+    if (!addBeds && !addTowels) return;
+    setInvLoading(true);
+    try {
+      await addCleanLinen(Number(addBeds) || 0, Number(addTowels) || 0);
+      setAddBeds(0);
+      setAddTowels(0);
+      const updated = await getLinenInventory();
+      setInventory(updated);
+    } finally {
+      setInvLoading(false);
+    }
+  };
+
+  const handleResetInventory = async () => {
+    const b = prompt('Inserisci il nuovo totale Kit Letto:');
+    const t = prompt('Inserisci il nuovo totale Kit Asciugamani:');
+    if (b !== null && t !== null) {
+      setInvLoading(true);
+      try {
+        await setLinenInventory(Number(b), Number(t));
+        const updated = await getLinenInventory();
+        setInventory(updated);
+      } finally {
+        setInvLoading(false);
+      }
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm('Vuoi davvero eliminare questa prenotazione?')) return;
     await deleteBooking(id);
@@ -127,6 +167,65 @@ export default function ManageBookings() {
           Aggiungi
         </Button>
       </Group>
+
+      {/* ── Gestione Inventario ────────────────── */}
+      {inventory && (
+        <Paper withBorder p="md" mb="xl" radius="lg" style={{ borderColor: 'var(--mantine-color-teal-2)', background: 'var(--mantine-color-teal-light)' }}>
+          <Stack gap="xs">
+            <Group justify="space-between" align="center">
+              <Group gap="xs">
+                <ThemeIcon variant="light" color="teal" radius="md">
+                  <IconShirt size={18} />
+                </ThemeIcon>
+                <Text fw={700} size="sm">Gestione Inventario Puliti</Text>
+              </Group>
+              <Button variant="subtle" color="gray" size="compact-xs" onClick={handleResetInventory}>Rettifica Totali</Button>
+            </Group>
+            
+            <Group grow align="flex-end" gap="md">
+              <NumberInput 
+                label="Rientro Letto" 
+                size="xs" 
+                min={0} 
+                value={addBeds} 
+                onChange={setAddBeds}
+                placeholder="+0"
+              />
+              <NumberInput 
+                label="Rientro Asciugamani" 
+                size="xs" 
+                min={0} 
+                value={addTowels} 
+                onChange={setAddTowels}
+                placeholder="+0"
+              />
+              <Button 
+                variant="filled" 
+                color="teal" 
+                size="xs" 
+                onClick={handleRestock} 
+                loading={invLoading}
+                leftSection={<IconPlus size={14} />}
+              >
+                Aggiungi
+              </Button>
+            </Group>
+            
+            <Divider color="white" />
+            
+            <Group justify="space-around">
+              <Box ta="center">
+                <Text size="11px" fw={700} c="dimmed" tt="uppercase">Attuali Letto</Text>
+                <Text fw={800} size="xl" c="teal.9">{inventory.bedKits}</Text>
+              </Box>
+              <Box ta="center">
+                <Text size="11px" fw={700} c="dimmed" tt="uppercase">Attuali Asciugamani</Text>
+                <Text fw={800} size="xl" c="teal.9">{inventory.towelKits}</Text>
+              </Box>
+            </Group>
+          </Stack>
+        </Paper>
+      )}
 
       {loading ? (
         <Text c="dimmed" ta="center" py="xl">Caricamento...</Text>
