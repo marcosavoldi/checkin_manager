@@ -60,9 +60,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                 fit="contain"
                 fallbackSrc="/appicon.png"
               />
-              <Text fw={900} size="xl" visibleFrom="xs" style={{ 
+              <Text fw={900} size="md" style={{ 
                 letterSpacing: -1, 
-                color: computedColorScheme === 'light' ? '#000' : '#fff' 
+                color: computedColorScheme === 'light' ? '#000' : '#fff',
+                whiteSpace: 'nowrap'
               }}>
                 Lazzaretto City Walk
               </Text>
