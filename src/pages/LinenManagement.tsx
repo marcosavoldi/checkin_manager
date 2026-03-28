@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
-  Title, Button, Group, Stack, Text, Divider, ThemeIcon, Paper, NumberInput, SimpleGrid, Container, Box, useComputedColorScheme
+  Title, Button, Group, Stack, Text, Divider, ThemeIcon, Paper, NumberInput, SimpleGrid, Container, useComputedColorScheme
 } from '@mantine/core';
-import { IconBed, IconBath, IconPlus, IconRefresh, IconAlertCircle } from '@tabler/icons-react';
+import { IconBed, IconBath, IconRefresh, IconAlertCircle } from '@tabler/icons-react';
 import { getLinenInventory, addCleanLinen, setLinenInventory, type LinenInventory } from '../services/inventoryService';
 import dayjs from 'dayjs';
 
@@ -65,7 +65,7 @@ export default function LinenManagement() {
       <Stack gap="xl">
         <Group justify="space-between" align="center">
           <div>
-            <Title order={1} fw={900} lts="-1px">Biancheria</Title>
+            <Title order={1} fw={900} lts="-1px" c="var(--mantine-color-text)">Biancheria</Title>
             <Text c="dimmed" size="sm" fw={500}>Gestione stock e rientri lavanderia</Text>
           </div>
           <Button 
@@ -81,50 +81,42 @@ export default function LinenManagement() {
 
         {inventory && (
           <Stack gap="lg">
-            {/* 1. SEZIONE CARICO (Spostata in alto) */}
-            <Paper withBorder p="xl" radius="24px" shadow="md" style={glassStyles}>
-              <Stack gap="lg">
-                <Group gap="xs">
-                  <ThemeIcon variant="filled" color="teal" radius="xl" size="md">
-                    <IconPlus size={18} />
-                  </ThemeIcon>
-                  <Title order={4}>Registra Rientro dalla Lavanderia</Title>
-                </Group>
+            {/* 1. SEZIONE CARICO (Ultra-compatta) */}
+            <Paper withBorder p="lg" radius="24px" shadow="md" style={glassStyles}>
+              <Stack gap="md">
+                <Title order={5} tt="uppercase" lts="1px" c="dimmed" ta="center">Registra Rientro Lavanderia</Title>
                 
-                <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="md">
+                <Group grow wrap="nowrap" align="flex-end" gap="xs">
                   <NumberInput 
-                    label="Kit Letto Puliti" 
+                    label="Kit Letto" 
                     placeholder="0"
                     min={0} 
-                    size="md"
+                    size="sm"
                     radius="md"
                     value={addBeds} 
                     onChange={setAddBeds}
                   />
                   <NumberInput 
-                    label="Kit Asciugamani Puliti" 
+                    label="Kit Asciugamani" 
                     placeholder="0"
                     min={0} 
-                    size="md"
+                    size="sm"
                     radius="md"
                     value={addTowels} 
                     onChange={setAddTowels}
                   />
-                  <Box style={{ display: 'flex', alignItems: 'flex-end' }}>
-                    <Button 
-                      variant="filled" 
-                      color="teal" 
-                      size="md"
-                      radius="md"
-                      fullWidth
-                      onClick={handleRestock} 
-                      loading={invLoading}
-                      disabled={!addBeds && !addTowels}
-                    >
-                      Aggiorna Stock
-                    </Button>
-                  </Box>
-                </SimpleGrid>
+                  <Button 
+                    variant="filled" 
+                    color="teal" 
+                    size="sm"
+                    radius="md"
+                    onClick={handleRestock} 
+                    loading={invLoading}
+                    disabled={!addBeds && !addTowels}
+                  >
+                    Carica
+                  </Button>
+                </Group>
               </Stack>
             </Paper>
 
