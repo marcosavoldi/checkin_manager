@@ -186,6 +186,46 @@ export default function Home() {
                     <Badge color="orange" variant="light" leftSection={<IconAlertCircle size={10} />}>Configurazione richiesta</Badge>
                   )}
                 </Group>
+                {(inventory.bedKits === 0 && inventory.towelKits === 0) ? (
+                  <Stack align="center" py="sm" gap="xs">
+                    <Text size="sm" ta="center" c="dimmed">Benvenuto! Imposta la tua disponibilità iniziale di kit puliti.</Text>
+                    <Button 
+                      variant="light" 
+                      color="indigo" 
+                      size="xs" 
+                      radius="xl"
+                      rightSection={<IconArrowRight size={14} />}
+                      onClick={() => window.location.href = '/biancheria'}
+                    >
+                      Configura ora
+                    </Button>
+                  </Stack>
+                ) : (
+                  <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
+                    <Group gap="md" align="center" wrap="nowrap">
+                      <ThemeIcon size={48} radius="xl" color="indigo" variant="light">
+                        <IconBed size={26} />
+                      </ThemeIcon>
+                      <div style={{ flex: 1 }}>
+                        <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts="0.5px">Kit Letto</Text>
+                        <Title order={2} c={inventory.bedKits < 0 ? 'red.6' : 'indigo.9'} style={{ lineHeight: 1 }}>
+                          {inventory.bedKits}
+                        </Title>
+                      </div>
+                    </Group>
+                    <Group gap="md" align="center" wrap="nowrap">
+                      <ThemeIcon size={48} radius="xl" color="teal" variant="light">
+                        <IconBath size={26} />
+                      </ThemeIcon>
+                      <div style={{ flex: 1 }}>
+                        <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts="0.5px">Kit Asciugamani</Text>
+                        <Title order={2} c={inventory.towelKits < 0 ? 'red.6' : 'teal.9'} style={{ lineHeight: 1 }}>
+                          {inventory.towelKits}
+                        </Title>
+                      </div>
+                    </Group>
+                  </SimpleGrid>
+                )}
 
                 
                 <Text size="10px" c="dimmed" mt="md" ta="right" fw={500}>
