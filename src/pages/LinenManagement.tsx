@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Title, Button, Group, Stack, Text, Divider, ThemeIcon, Paper, NumberInput, SimpleGrid, Container, Badge, Box, useComputedColorScheme
+  Title, Button, Group, Stack, Text, Divider, ThemeIcon, Paper, NumberInput, SimpleGrid, Container, Box, useComputedColorScheme
 } from '@mantine/core';
 import { IconBed, IconBath, IconPlus, IconRefresh, IconAlertCircle } from '@tabler/icons-react';
 import { getLinenInventory, addCleanLinen, setLinenInventory, type LinenInventory } from '../services/inventoryService';
@@ -66,7 +66,7 @@ export default function LinenManagement() {
         <Group justify="space-between" align="center">
           <div>
             <Title order={1} fw={900} lts="-1px">Biancheria</Title>
-            <Text c="dimmed" size="sm" fw={500}>Monitoraggio e gestione dello stock pulito</Text>
+            <Text c="dimmed" size="sm" fw={500}>Gestione stock e rientri lavanderia</Text>
           </div>
           <Button 
             variant="subtle" 
@@ -80,63 +80,9 @@ export default function LinenManagement() {
         </Group>
 
         {inventory && (
-          <>
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-              <Paper 
-                withBorder 
-                p="xl" 
-                radius="24px" 
-                shadow="sm"
-                style={{ ...glassStyles, borderLeft: inventory.bedKits < 0 ? "6px solid var(--mantine-color-red-6)" : "6px solid var(--mantine-color-indigo-6)" }}
-              >
-                <Stack align="center" gap="xs">
-                  <ThemeIcon size={64} radius="xl" color="indigo" variant="light">
-                    <IconBed size={36} />
-                  </ThemeIcon>
-                  <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Kit Letto Disponibili</Text>
-                  <Title order={1} size="64px" c={inventory.bedKits < 0 ? 'red.6' : 'indigo.9'} lts="-2px">
-                    {inventory.bedKits}
-                  </Title>
-                  {inventory.bedKits < 0 && (
-                    <Badge color="red" variant="dot" size="sm">Sotto scorta / Deficit</Badge>
-                  )}
-                </Stack>
-              </Paper>
-
-              <Paper 
-                withBorder 
-                p="xl" 
-                radius="24px" 
-                shadow="sm"
-                style={{ ...glassStyles, borderLeft: inventory.towelKits < 0 ? "6px solid var(--mantine-color-red-6)" : "6px solid var(--mantine-color-teal-6)" }}
-              >
-                <Stack align="center" gap="xs">
-                  <ThemeIcon size={64} radius="xl" color="teal" variant="light">
-                    <IconBath size={36} />
-                  </ThemeIcon>
-                  <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Kit Asciugamani Disponibili</Text>
-                  <Title order={1} size="64px" c={inventory.towelKits < 0 ? 'red.6' : 'teal.9'} lts="-2px">
-                    {inventory.towelKits}
-                  </Title>
-                  {inventory.towelKits < 0 && (
-                    <Badge color="red" variant="dot" size="sm">Sotto scorta / Deficit</Badge>
-                  )}
-                </Stack>
-              </Paper>
-            </SimpleGrid>
-
-            {(inventory.bedKits === 0 && inventory.towelKits === 0) && (
-              <Paper p="md" radius="lg" bg="orange.0" style={{ ...glassStyles, border: "1px solid var(--mantine-color-orange-2)" }}>
-                <Group wrap="nowrap" gap="sm">
-                  <IconAlertCircle color="var(--mantine-color-orange-6)" />
-                  <Text size="sm" c="orange.9" fw={500}>
-                    L'inventario è vuoto. Usa <b>"Rettifica Totali"</b> qui sotto per impostare la tua disponibilità attuale di kit puliti.
-                  </Text>
-                </Group>
-              </Paper>
-            )}
-
-            <Paper withBorder p="xl" radius="24px" shadow="md">
+          <Stack gap="lg">
+            {/* 1. SEZIONE CARICO (Spostata in alto) */}
+            <Paper withBorder p="xl" radius="24px" shadow="md" style={glassStyles}>
               <Stack gap="lg">
                 <Group gap="xs">
                   <ThemeIcon variant="filled" color="teal" radius="xl" size="md">
@@ -179,28 +125,87 @@ export default function LinenManagement() {
                     </Button>
                   </Box>
                 </SimpleGrid>
-                
-                <Divider label="Configurazione Iniziale" labelPosition="center" color="gray.1" />
-                
-                <Group justify="center">
-                  <Button 
-                    variant="light" 
-                    color="gray" 
-                    size="xs" 
-                    radius="xl"
-                    onClick={handleResetInventory}
-                    leftSection={<IconRefresh size={14} />}
-                  >
-                    Rettifica Manuale Totali
-                  </Button>
-                </Group>
               </Stack>
             </Paper>
 
-            <Text size="xs" c="dimmed" ta="center" fw={500}>
-              Aggiornato: {dayjs(inventory.lastUpdated?.toDate ? inventory.lastUpdated.toDate() : inventory.lastUpdated).format('DD MMMM [alle] HH:mm')}
-            </Text>
-          </>
+            {(inventory.bedKits === 0 && inventory.towelKits === 0) && (
+              <Paper p="md" radius="lg" bg="orange.0" style={{ ...glassStyles, border: "1px solid var(--mantine-color-orange-2)" }}>
+                <Group wrap="nowrap" gap="sm">
+                  <IconAlertCircle color="var(--mantine-color-orange-6)" />
+                  <Text size="sm" c="orange.9" fw={500}>
+                    L'inventario è vuoto. Imposta la tua disponibilità attuale di kit puliti.
+                  </Text>
+                </Group>
+              </Paper>
+            )}
+
+            <Divider label="Riepilogo Disponibilità" labelPosition="center" color="gray.2" />
+
+            {/* 2. STATO INVENTARIO (Più compatto, in basso) */}
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+              <Paper 
+                withBorder 
+                p="md" 
+                radius="xl" 
+                shadow="sm"
+                style={{ ...glassStyles, borderLeft: inventory.bedKits < 0 ? "6px solid var(--mantine-color-red-6)" : "6px solid var(--mantine-color-indigo-6)" }}
+              >
+                <Group justify="space-between" wrap="nowrap">
+                  <Group gap="sm">
+                    <ThemeIcon size={40} radius="xl" color="indigo" variant="light">
+                      <IconBed size={22} />
+                    </ThemeIcon>
+                    <div>
+                      <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Kit Letto</Text>
+                      <Text size="xs" c="dimmed" fw={500}>Disponibili</Text>
+                    </div>
+                  </Group>
+                  <Title order={2} c={inventory.bedKits < 0 ? 'red.6' : 'indigo.9'} lts="-1px">
+                    {inventory.bedKits}
+                  </Title>
+                </Group>
+              </Paper>
+
+              <Paper 
+                withBorder 
+                p="md" 
+                radius="xl" 
+                shadow="sm"
+                style={{ ...glassStyles, borderLeft: inventory.towelKits < 0 ? "6px solid var(--mantine-color-red-6)" : "6px solid var(--mantine-color-teal-6)" }}
+              >
+                <Group justify="space-between" wrap="nowrap">
+                  <Group gap="sm">
+                    <ThemeIcon size={40} radius="xl" color="teal" variant="light">
+                      <IconBath size={22} />
+                    </ThemeIcon>
+                    <div>
+                      <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Kit Asciugamani</Text>
+                      <Text size="xs" c="dimmed" fw={500}>Disponibili</Text>
+                    </div>
+                  </Group>
+                  <Title order={2} c={inventory.towelKits < 0 ? 'red.6' : 'teal.9'} lts="-1px">
+                    {inventory.towelKits}
+                  </Title>
+                </Group>
+              </Paper>
+            </SimpleGrid>
+
+            <Group justify="space-between" align="center" mt="xs">
+              <Text size="xs" c="dimmed" fw={500}>
+                Ultimo aggiornamento: {dayjs(inventory.lastUpdated?.toDate ? inventory.lastUpdated.toDate() : inventory.lastUpdated).format('DD MMM, HH:mm')}
+              </Text>
+              <Button 
+                variant="subtle" 
+                color="gray" 
+                size="xs" 
+                radius="xl"
+                onClick={handleResetInventory}
+                leftSection={<IconRefresh size={14} />}
+              >
+                Rettifica Manuale
+              </Button>
+            </Group>
+          </Stack>
         )}
       </Stack>
     </Container>
