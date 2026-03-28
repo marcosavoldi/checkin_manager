@@ -47,26 +47,33 @@ function StaffNote({ note }: { note: string }) {
   const isLong = note.length > NOTE_THRESHOLD;
   return (
     <Box
-      mt={8}
+      mt={10}
       p="xs"
       style={{
-        background: 'var(--mantine-color-blue-light)',
-        borderRadius: 8,
-        borderLeft: '3px solid var(--mantine-color-blue-5)'
+        background: 'var(--mantine-color-yellow-light)',
+        borderRadius: 12,
+        border: '1.5px solid var(--mantine-color-yellow-4)',
+        boxShadow: '0 2px 8px rgba(255, 193, 7, 0.15)',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
-      <Group gap={5} mb={3}>
-        <IconNotes size={12} color="var(--mantine-color-blue-6)" />
-        <Text size="xs" fw={700} c="blue.7">Nota Staff</Text>
+      <Group gap={5} mb={4}>
+        <ThemeIcon variant="light" color="yellow" size="sm" radius="xl">
+          <IconNotes size={12} stroke={2.5} />
+        </ThemeIcon>
+        <Text size="xs" fw={800} c="yellow.9" tt="uppercase" style={{ letterSpacing: 0.5 }}>
+          Nota Staff Importante
+        </Text>
       </Group>
       {isLong ? (
         <>
           <Collapse in={expanded}>
-            <Text size="xs" c="dimmed">{note}</Text>
+            <Text size="xs" fw={500} c="dark.7" style={{ lineHeight: 1.4 }}>{note}</Text>
           </Collapse>
-          {!expanded && <Text size="xs" c="dimmed" lineClamp={2}>{note}</Text>}
+          {!expanded && <Text size="xs" fw={500} c="dark.7" lineClamp={2} style={{ lineHeight: 1.4 }}>{note}</Text>}
           <Button
-            size="compact-xs" variant="subtle" color="blue" mt={4} p={0}
+            size="compact-xs" variant="subtle" color="yellow" mt={4} p={0}
             rightSection={expanded ? <IconChevronUp size={10} /> : <IconChevronDown size={10} />}
             onClick={() => setExpanded(e => !e)}
             style={{ height: 'auto' }}
@@ -75,7 +82,7 @@ function StaffNote({ note }: { note: string }) {
           </Button>
         </>
       ) : (
-        <Text size="xs" c="dimmed">{note}</Text>
+        <Text size="xs" fw={600} c="dark.7" style={{ lineHeight: 1.4 }}>{note}</Text>
       )}
     </Box>
   );
@@ -276,18 +283,20 @@ export default function Dashboard() {
                   {/* Row 4: Staff note */}
                   {b.staffNote && <StaffNote note={b.staffNote} />}
 
-                  {/* Row 5: CTA button */}
-                  <Button
-                    fullWidth
-                    size="xs"
-                    variant="light"
-                    color="violet"
-                    mt="md"
-                    radius="md"
-                    onClick={() => setSelectedBooking(b)}
-                  >
-                    Note & Dettagli
-                  </Button>
+                  {/* Row 5: CTA button (Admin ONLY) */}
+                  {isAdmin && (
+                    <Button
+                      fullWidth
+                      size="xs"
+                      variant="light"
+                      color="violet"
+                      mt="md"
+                      radius="md"
+                      onClick={() => setSelectedBooking(b)}
+                    >
+                      Note & Dettagli
+                    </Button>
+                  )}
                 </Card>
               </Grid.Col>
             ))}
