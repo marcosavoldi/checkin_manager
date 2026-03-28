@@ -51,7 +51,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           <Group align="center" gap={6} style={{ flex: 1, flexWrap: 'nowrap' }}>
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
             <Image
-              src={computedColorScheme === 'light' ? '/Logo.jpg' : '/Logo1.png'}
+              src={computedColorScheme === 'light' ? '/logo_black.png' : '/logo_white.png'}
               h={32}
               w="auto"
               fit="contain"
