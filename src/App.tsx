@@ -1,4 +1,4 @@
-import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip } from '@mantine/core';
+import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconBed, IconUsers } from '@tabler/icons-react';
@@ -52,13 +52,21 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         <Group h="100%" px="md" justify="space-between" align="center">
           <Group align="center" gap={6} style={{ flex: 1, flexWrap: 'nowrap' }}>
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-            <Image
-              src={computedColorScheme === 'light' ? '/logo_black.png' : '/logo_white.png'}
-              h={40}
-              w="auto"
-              fit="contain"
-              fallbackSrc="/appicon.png"
-            />
+            <Group gap={10} style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+              <Image
+                src={computedColorScheme === 'light' ? '/logo_black.png' : '/logo_white.png'}
+                h={40}
+                w="auto"
+                fit="contain"
+                fallbackSrc="/appicon.png"
+              />
+              <Text fw={900} size="xl" visibleFrom="xs" style={{ 
+                letterSpacing: -1, 
+                color: computedColorScheme === 'light' ? '#000' : '#fff' 
+              }}>
+                Lazzaretto City Walk
+              </Text>
+            </Group>
           </Group>
           
           <Group gap={10}>

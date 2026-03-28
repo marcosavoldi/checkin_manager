@@ -133,7 +133,10 @@ export default function StaffManagement() {
     <Container size="md" py="md" px="xs">
       <Stack gap="md">
         <Box mb={5}>
-          <Title order={2} fw={900} size={28} style={{ letterSpacing: -1 }}>
+          <Title order={2} fw={900} size={28} style={{ 
+            letterSpacing: -1,
+            color: 'var(--mantine-color-text)'
+          }}>
             Gestione Accessi
           </Title>
         </Box>
@@ -149,7 +152,7 @@ export default function StaffManagement() {
               <ThemeIcon color="violet" size="md" radius="sm" variant="light">
                 <IconShieldCheck size={18} />
               </ThemeIcon>
-              <Text fw={700} size="sm">Admin Autorizzati</Text>
+              <Text fw={700} size="sm" c="var(--mantine-color-text)">Admin Autorizzati</Text>
             </Group>
             <Button 
               variant="light" 
@@ -175,7 +178,7 @@ export default function StaffManagement() {
                 }}
               >
                 <Group justify="space-between">
-                  <Text size="xs" fw={500} truncate>{a.email}</Text>
+                  <Text size="xs" fw={500} truncate c="white">{a.email}</Text>
                   <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDeleteAdmin(a.id)}>
                     <IconTrash size={14} />
                   </ActionIcon>
@@ -199,7 +202,7 @@ export default function StaffManagement() {
               <ThemeIcon color="blue" size="md" radius="sm" variant="light">
                 <IconUserCircle size={18} />
               </ThemeIcon>
-              <Text fw={700} size="sm">Accrediti Staff</Text>
+              <Text fw={700} size="sm" c="var(--mantine-color-text)">Accrediti Staff</Text>
             </Group>
             <Button 
               variant="filled" 
@@ -226,8 +229,8 @@ export default function StaffManagement() {
               >
                 <Group justify="space-between" wrap="nowrap">
                   <Box style={{ overflow: 'hidden' }}>
-                    <Text fw={600} size="xs" truncate>{s.name}</Text>
-                    <Text size="10px" c="dimmed" truncate>{s.email}</Text>
+                    <Text fw={600} size="xs" truncate c="white">{s.name}</Text>
+                    <Text size="10px" c="rgba(255,255,255,0.7)" truncate>{s.email}</Text>
                   </Box>
                   <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDeleteStaff(s.id, s.email)}>
                     <IconTrash size={14} />
@@ -250,7 +253,10 @@ export default function StaffManagement() {
               size="sm"
               required
               value={newStaff.name}
-              onChange={(e) => setNewStaff((prev) => ({ ...prev, name: e.currentTarget.value }))}
+              onChange={(e) => {
+                const val = e.currentTarget.value;
+                setNewStaff((prev) => ({ ...prev, name: val }));
+              }}
               radius="md"
             />
             <TextInput 
@@ -260,7 +266,10 @@ export default function StaffManagement() {
               required 
               leftSection={<IconMail size={14} />}
               value={newStaff.email}
-              onChange={(e) => setNewStaff((prev) => ({ ...prev, email: e.currentTarget.value }))}
+              onChange={(e) => {
+                const val = e.currentTarget.value;
+                setNewStaff((prev) => ({ ...prev, email: val }));
+              }}
               radius="md"
             />
             <PasswordInput 
@@ -270,7 +279,10 @@ export default function StaffManagement() {
               required 
               leftSection={<IconLock size={14} />}
               value={newStaff.password}
-              onChange={(e) => setNewStaff((prev) => ({ ...prev, password: e.currentTarget.value }))}
+              onChange={(e) => {
+                const val = e.currentTarget.value;
+                setNewStaff((prev) => ({ ...prev, password: val }));
+              }}
               radius="md"
             />
             <Button fullWidth onClick={handleAddStaff} loading={saving} mt="md" radius="md" size="sm">
@@ -289,7 +301,10 @@ export default function StaffManagement() {
               required 
               leftSection={<IconBrandGoogle size={14} />}
               value={newAdminEmail}
-              onChange={(e) => setNewAdminEmail(e.currentTarget.value)}
+              onChange={(e) => {
+                const val = e.currentTarget.value;
+                setNewAdminEmail(val);
+              }}
               radius="md"
             />
             <Button fullWidth onClick={handleAddAdmin} loading={saving} mt="md" radius="md" size="sm" color="violet">
