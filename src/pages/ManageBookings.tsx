@@ -64,12 +64,15 @@ export default function ManageBookings() {
   const load = async () => {
     setLoading(true);
     try {
-      const [bkngs, inv] = await Promise.all([
-        fetchUpcomingBookings(),
-        getLinenInventory()
-      ]);
+      const bkngs = await fetchUpcomingBookings();
       setBookings(bkngs);
-      setInventory(inv);
+      
+      try {
+        const inv = await getLinenInventory();
+        setInventory(inv);
+      } catch (err) {
+        console.warn('Inventory fetch failed (check firestore rules):', err);
+      }
     } finally {
       setLoading(false);
     }

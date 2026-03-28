@@ -31,6 +31,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Collezione Inventario (Biancheria)
+    match /inventory/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
     match /{document=**} {
       allow read, write: if false;
     }

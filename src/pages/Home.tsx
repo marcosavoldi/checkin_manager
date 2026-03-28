@@ -24,17 +24,22 @@ export default function Home() {
   const loadAll = async () => {
     setLoading(true);
     try {
-      const [bkngs, inv] = await Promise.all([
-        fetchUpcomingBookings(),
-        getLinenInventory()
-      ]);
+      try {
+        inv = await getLinenInventory();
+      } catch (err) {
+        console.warn('Inventory fetch failed (check firestore rules):', err);
+      }
       
       // Sincronizza consumi se admin
-      if (bkngs.length > 0) {
+      if (bkngs.length > 0 && inv) {
         await processLinenConsumption(bkngs, subtractLinen);
         // Ricarica inventario se cambiato
-        const updatedInv = await getLinenInventory();
-        setInventory(updatedInv);
+        try {
+          const updatedInv = await getLinenInventory();
+          setInventory(updatedInv);
+        } catch (err) {
+          setInventory(inv);
+        }
       } else {
         setInventory(inv);
       }
