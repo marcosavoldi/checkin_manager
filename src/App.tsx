@@ -44,14 +44,16 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     >
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between" align="center">
-          <Group align="center" gap="xs">
+          <Group align="center" gap={6} style={{ flex: 1, flexWrap: 'nowrap' }}>
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
             <Image
               src={computedColorScheme === 'light' ? '/Logo.jpg' : '/Logo1.png'}
-              h={36}
+              h={32}
+              w="auto"
+              fit="contain"
               fallbackSrc="/appicon.png"
             />
-            <MantineText fw={700} size="sm" style={{ letterSpacing: -0.5 }} visibleFrom="sm">
+            <MantineText fw={700} size="sm" style={{ letterSpacing: -0.5, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
               Lazzaretto City Walk
             </MantineText>
           </Group>
