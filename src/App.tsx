@@ -1,18 +1,19 @@
-import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Text as MantineText } from '@mantine/core';
+import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Text as MantineText, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon } from '@tabler/icons-react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome } from '@tabler/icons-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ManageBookings from './pages/ManageBookings';
+import Home from './pages/Home';
 
 function ProtectedRoute({ children, adminOnly }: { children: React.ReactNode, adminOnly?: boolean }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return <Login />;
   if (adminOnly && user.appRole !== 'admin') {
-    return <Dashboard />;
+    return <Navigate to="/home" />;
   }
   return <>{children}</>;
 }
@@ -28,6 +29,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   if (!user || loading) return <>{children}</>;
 
   const navItems = [
+    { label: 'Home', icon: <IconHome size={16} />, path: '/home' },
     { label: 'Dashboard', icon: <IconLayoutDashboard size={16} />, path: '/' },
     ...(user.appRole === 'admin'
       ? [{ label: 'Gestione Prenotazioni', icon: <IconCalendarPlus size={16} />, path: '/gestione' }]
@@ -53,18 +55,32 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             <MantineText fw={700} size="lg" visibleFrom="xs">Lazzaretto City Walk</MantineText>
           </Group>
           
-          <ActionIcon
-            onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
-            variant="default"
-            size="lg"
-            radius="md"
-          >
-            {computedColorScheme === 'light' ? (
-              <IconMoon stroke={1.5} size={20} />
-            ) : (
-              <IconSun stroke={1.5} size={20} />
-            )}
-          </ActionIcon>
+          <Group gap={10}>
+            <Tooltip label="Home">
+              <ActionIcon
+                variant={location.pathname === '/home' ? 'light' : 'subtle'}
+                color="violet"
+                size="lg"
+                onClick={() => navigate('/home')}
+                radius="md"
+              >
+                <IconHome size={20} />
+              </ActionIcon>
+            </Tooltip>
+
+            <ActionIcon
+              onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
+              variant="default"
+              size="lg"
+              radius="md"
+            >
+              {computedColorScheme === 'light' ? (
+                <IconMoon stroke={1.5} size={20} />
+              ) : (
+                <IconSun stroke={1.5} size={20} />
+              )}
+            </ActionIcon>
+          </Group>
         </Group>
       </AppShell.Header>
 
@@ -100,7 +116,9 @@ export default function App() {
             <MainLayout>
               <Routes>
                 <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                 <Route path="/gestione" element={<ProtectedRoute adminOnly><ManageBookings /></ProtectedRoute>} />
+                <Route path="*" element={<Navigate to="/home" />} />
               </Routes>
             </MainLayout>
           } />
