@@ -82,7 +82,7 @@ export default function Home() {
     <Stack gap="lg">
       <Group justify="space-between" align="center">
         <div>
-          <Title order={2} fw={800}>Benvenuto, {user?.displayName?.split(' ')[0]}</Title>
+          <Title order={2} fw={800} c="var(--mantine-color-text)">Benvenuto, {user?.displayName?.split(' ')[0]}</Title>
           <Text c="dimmed">Panoramica attività Lazzaretto City Walk</Text>
         </div>
       </Group>

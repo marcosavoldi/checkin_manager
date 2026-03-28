@@ -142,7 +142,7 @@ export default function Dashboard() {
         <Group gap="sm" align="center">
           <Avatar src={user?.photoURL} size="md" radius="xl" />
           <Stack gap={2}>
-            <Title order={5} fw={700} lh={1}>{user?.displayName}</Title>
+            <Title order={5} fw={700} lh={1} c="var(--mantine-color-text)">{user?.displayName}</Title>
             <Badge
               size="xs"
               variant="light"
