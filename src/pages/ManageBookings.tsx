@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import {
   Title, Button, Group, Stack, Text, Card, Badge,
   Modal, TextInput, Textarea, Select, ActionIcon, Tooltip,
-  Box, Divider, ThemeIcon, Paper, NumberInput
+  Box, Divider, ThemeIcon, Paper, NumberInput, Alert
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout, IconFileImport, IconCheck } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import {
   fetchUpcomingBookings,
@@ -34,6 +34,37 @@ const SOURCE_COLORS: Record<BookingSource, string> = {
   direct: 'teal'
 };
 
+const IMPORT_DATA = [
+  { "guestName": "Sebastiano Sabattini", "source": "booking", "checkIn": "2026-04-11 15:00:00", "checkOut": "2026-04-12 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Nicola Cavazzini", "source": "booking", "checkIn": "2026-07-18 15:00:00", "checkOut": "2026-07-19 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Zanya Crawford", "source": "booking", "checkIn": "2026-09-09 15:00:00", "checkOut": "2026-09-11 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Enrico Previtali", "source": "booking", "checkIn": "2026-03-27 15:00:00", "checkOut": "2026-03-28 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Monica Carpanese Beggiato", "source": "booking", "checkIn": "2026-03-25 15:00:00", "checkOut": "2026-03-26 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Matilda Jarvis", "source": "airbnb", "checkIn": "2026-04-12 15:00:00", "checkOut": "2026-04-13 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Dziyana Sadouskaya", "source": "booking", "checkIn": "2026-07-03 15:00:00", "checkOut": "2026-07-10 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Nicolo Vio", "source": "booking", "checkIn": "2026-04-02 15:00:00", "checkOut": "2026-04-03 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Sergio Montfort", "source": "booking", "checkIn": "2026-04-23 15:00:00", "checkOut": "2026-04-26 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Julia Jopek", "source": "booking", "checkIn": "2026-03-20 15:00:00", "checkOut": "2026-03-21 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Maciek Kożyczkowski", "source": "airbnb", "checkIn": "2026-04-18 14:00:00", "checkOut": "2026-04-21 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Mattia Riva", "source": "booking", "checkIn": "2026-03-21 14:00:00", "checkOut": "2026-03-22 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Andrea Selva", "source": "booking", "checkIn": "2026-05-09 15:00:00", "checkOut": "2026-05-10 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Prota Martina", "source": "booking", "checkIn": "2026-06-03 15:00:00", "checkOut": "2026-06-04 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Claudio Tamburini", "source": "booking", "checkIn": "2026-09-04 15:00:00", "checkOut": "2026-09-06 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Dorothea Bodeker", "source": "booking", "checkIn": "2026-04-03 14:00:00", "checkOut": "2026-04-06 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Martina Veneziano", "source": "airbnb", "checkIn": "2026-03-28 14:00:00", "checkOut": "2026-03-30 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Maurizio Guetti", "source": "booking", "checkIn": "2026-03-26 15:00:00", "checkOut": "2026-03-27 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Cinzia Poggi", "source": "booking", "checkIn": "2026-04-21 15:00:00", "checkOut": "2026-04-23 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Katarzyna Suminska", "source": "booking", "checkIn": "2026-06-28 14:00:00", "checkOut": "2026-06-29 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Arkadiusz Cyprych", "source": "booking", "checkIn": "2026-05-22 15:00:00", "checkOut": "2026-05-25 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Joana Amaro", "source": "airbnb", "checkIn": "2026-04-29 14:00:00", "checkOut": "2026-04-30 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Maffei Maria", "source": "booking", "checkIn": "2026-04-13 14:00:00", "checkOut": "2026-04-15 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Rafal Roslik", "source": "booking", "checkIn": "2026-04-10 15:00:00", "checkOut": "2026-04-11 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Brigitte Van Hooijdonk", "source": "booking", "checkIn": "2026-07-31 14:00:00", "checkOut": "2026-08-01 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Giovanna Capitanio", "source": "booking", "checkIn": "2026-04-07 15:00:00", "checkOut": "2026-04-10 11:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Mokrousova Anastasiia", "source": "booking", "checkIn": "2026-04-16 15:00:00", "checkOut": "2026-04-18 10:00:00", "adults": 2, "children": 0 },
+  { "guestName": "Elena Sfondrini", "source": "booking", "checkIn": "2026-05-01 14:00:00", "checkOut": "2026-05-03 11:00:00", "adults": 2, "children": 0 }
+];
+
 const EMPTY_FORM = {
   checkIn: null as DateValue,
   checkOut: null as DateValue,
@@ -50,6 +81,8 @@ export default function ManageBookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importSuccess, setImportSuccess] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [opened, { open, close }] = useDisclosure(false);
@@ -110,8 +143,36 @@ export default function ManageBookings() {
     await load();
   };
 
+  const runBulkImport = async () => {
+    if (!confirm(`Vuoi importare ${IMPORT_DATA.length} prenotazioni da CSV?`)) return;
+    setImporting(true);
+    try {
+      let count = 0;
+      for (const b of IMPORT_DATA) {
+        await addBooking({
+          guestName: b.guestName,
+          source: b.source as BookingSource,
+          checkIn: new Date(b.checkIn),
+          checkOut: new Date(b.checkOut),
+          adults: b.adults,
+          children: b.children,
+          staffNote: '',
+          adminNote: 'Importato via CSV'
+        }, user!.uid);
+        count++;
+      }
+      setImportSuccess(count);
+      await load();
+    } catch (err) {
+      console.error(err);
+      alert('Errore durante l\'importazione. Controlla la console.');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
-    <Box>
+    <Box pb={80}>
       {/* ── Header ─────────────────────────────── */}
       <Group justify="space-between" mb="xl" align="flex-end">
         <div>
@@ -128,6 +189,31 @@ export default function ManageBookings() {
         </Button>
       </Group>
 
+      {/* ── Bulk Import (Temp) ──────────────────── */}
+      <Paper withBorder p="md" mb="xl" radius="lg" style={{ borderColor: 'var(--mantine-color-violet-4)' }}>
+        <Group justify="space-between" align="center">
+          <div>
+            <Group gap={8}>
+              <IconFileImport size={20} color="var(--mantine-color-violet-6)" />
+              <Text fw={700}>Importazione da CSV</Text>
+            </Group>
+            <Text size="xs" c="dimmed">Trovati {IMPORT_DATA.length} record in `prenotazioni.csv`</Text>
+          </div>
+          <Button 
+            variant="light" color="violet" size="xs" 
+            onClick={runBulkImport} loading={importing}
+            disabled={importSuccess !== null}
+          >
+            Avvia Importazione
+          </Button>
+        </Group>
+        {importSuccess !== null && (
+          <Alert color="green" variant="light" mt="sm" icon={<IconCheck size={16} />}>
+            Importazione completata con successo: {importSuccess} record aggiunti.
+          </Alert>
+        )}
+      </Paper>
+
       {loading ? (
         <Text c="dimmed" ta="center" py="xl">Caricamento...</Text>
       ) : bookings.length === 0 ? (
@@ -141,7 +227,6 @@ export default function ManageBookings() {
           {bookings.map(b => (
             <Card key={b.id} withBorder shadow="xs" radius="lg" padding="md">
               <Group justify="space-between" align="flex-start">
-                {/* Info principale */}
                 <Group gap="md" align="flex-start" style={{ flex: 1 }}>
                   <Box>
                     <Badge color={SOURCE_COLORS[b.source]} variant="light" size="sm" mb={4}>
@@ -180,7 +265,6 @@ export default function ManageBookings() {
                   </Group>
                 </Group>
 
-                {/* Azioni */}
                 <Group gap="xs" style={{ flexShrink: 0 }}>
                   <Tooltip label="Modifica">
                     <ActionIcon variant="subtle" color="blue" onClick={() => openEdit(b)}>
