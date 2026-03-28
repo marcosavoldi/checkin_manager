@@ -47,33 +47,33 @@ function StaffNote({ note }: { note: string }) {
   const isLong = note.length > NOTE_THRESHOLD;
   return (
     <Box
-      mt={10}
+      mt={14}
       p="xs"
       style={{
-        background: 'var(--mantine-color-yellow-light)',
+        background: 'rgba(255, 145, 0, 0.1)',
         borderRadius: 12,
-        border: '1.5px solid var(--mantine-color-yellow-4)',
-        boxShadow: '0 2px 8px rgba(255, 193, 7, 0.15)',
+        border: '2px solid #ff9100',
+        boxShadow: '0 4px 12px rgba(255, 145, 0, 0.25)',
         position: 'relative',
         overflow: 'hidden'
       }}
     >
-      <Group gap={5} mb={4}>
-        <ThemeIcon variant="light" color="yellow" size="sm" radius="xl">
+      <Group gap={6} mb={6}>
+        <ThemeIcon variant="filled" color="orange" size="sm" radius="xl">
           <IconNotes size={12} stroke={2.5} />
         </ThemeIcon>
-        <Text size="xs" fw={800} c="yellow.9" tt="uppercase" style={{ letterSpacing: 0.5 }}>
+        <Text size="xs" fw={900} c="orange.8" tt="uppercase" style={{ letterSpacing: 1 }}>
           Nota Staff Importante
         </Text>
       </Group>
       {isLong ? (
         <>
           <Collapse in={expanded}>
-            <Text size="xs" fw={500} c="dark.7" style={{ lineHeight: 1.4 }}>{note}</Text>
+            <Text size="sm" fw={700} c="var(--mantine-color-text)" style={{ lineHeight: 1.5 }}>{note}</Text>
           </Collapse>
-          {!expanded && <Text size="xs" fw={500} c="dark.7" lineClamp={2} style={{ lineHeight: 1.4 }}>{note}</Text>}
+          {!expanded && <Text size="sm" fw={700} c="var(--mantine-color-text)" lineClamp={2} style={{ lineHeight: 1.5 }}>{note}</Text>}
           <Button
-            size="compact-xs" variant="subtle" color="yellow" mt={4} p={0}
+            size="compact-xs" variant="subtle" color="orange" mt={6} p={0}
             rightSection={expanded ? <IconChevronUp size={10} /> : <IconChevronDown size={10} />}
             onClick={() => setExpanded(e => !e)}
             style={{ height: 'auto' }}
@@ -82,7 +82,7 @@ function StaffNote({ note }: { note: string }) {
           </Button>
         </>
       ) : (
-        <Text size="xs" fw={600} c="dark.7" style={{ lineHeight: 1.4 }}>{note}</Text>
+        <Text size="sm" fw={700} c="var(--mantine-color-text)" style={{ lineHeight: 1.5 }}>{note}</Text>
       )}
     </Box>
   );
