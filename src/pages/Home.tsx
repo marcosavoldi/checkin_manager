@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress } from '@mantine/core';
-import { IconHome, IconCalendarCheck, IconCalendarStats, IconDoorExit } from '@tabler/icons-react';
+import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider } from '@mantine/core';
+import { IconCalendarCheck, IconCalendarStats, IconDoorExit, IconLogin, IconLogout } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, type Booking } from '../services/bookingService';
 import dayjs from 'dayjs';
@@ -28,6 +28,11 @@ export default function Home() {
 
   if (loading) return <Text c="dimmed" ta="center" py="xl">Caricamento widget...</Text>;
 
+  // --- LOGICA DATE ---
+  const today = dayjs().startOf('day');
+  const startOfThisWeek = dayjs().startOf('week'); // Locale 'it' -> Lunedì
+  const endOfThisWeek = dayjs().endOf('week');
+
   // --- LOGICA ADMIN: Occupazione ---
   const getOccupancy = (monthOffset: number) => {
     const targetMonth = dayjs().add(monthOffset, 'month');
@@ -36,14 +41,13 @@ export default function Home() {
     
     let occupiedNights = 0;
     for (let i = 0; i < totalDays; i++) {
-      const currentDay = startOfMonth.add(i, 'day');
-      // Una notte è occupata se: checkIn <= currentDay < checkOut
-      const isOccupied = bookings.some(b => {
-        const inDate = dayjs(b.checkIn).startOf('day');
-        const outDate = dayjs(b.checkOut).startOf('day');
-        return (currentDay.isSame(inDate) || currentDay.isAfter(inDate)) && currentDay.isBefore(outDate);
-      });
-      if (isOccupied) occupiedNights++;
+       const currentDay = startOfMonth.add(i, 'day');
+       const isOccupied = bookings.some(b => {
+         const inDate = dayjs(b.checkIn).startOf('day');
+         const outDate = dayjs(b.checkOut).startOf('day');
+         return (currentDay.isSame(inDate) || currentDay.isAfter(inDate)) && currentDay.isBefore(outDate);
+       });
+       if (isOccupied) occupiedNights++;
     }
     
     return { 
@@ -57,138 +61,165 @@ export default function Home() {
   const currentMonth = getOccupancy(0);
   const nextMonth = getOccupancy(1);
 
-  // --- LOGICA STAFF: Checkout ---
-  const today = dayjs().startOf('day');
+  // --- LOGICA PROSSIMI EVENTI (Admin & Staff) ---
   const nextCheckout = bookings
     .filter(b => dayjs(b.checkOut).isAfter(today) || dayjs(b.checkOut).isSame(today))
     .sort((a, b) => dayjs(a.checkOut).diff(dayjs(b.checkOut)))[0];
 
-  // Settimana corrente (Lunedì - Domenica)
-  const startOfThisWeek = dayjs().startOf('week'); // Locale 'it' -> Lunedì
-  const endOfThisWeek = dayjs().endOf('week');
-  
-  // Settimana prossima (Lunedì - Domenica)
-  const startOfNextWeek = startOfThisWeek.add(1, 'week');
-  const endOfNextWeek = endOfThisWeek.add(1, 'week');
+  const nextCheckin = bookings
+    .filter(b => dayjs(b.checkIn).isAfter(today) || dayjs(b.checkIn).isSame(today))
+    .sort((a, b) => dayjs(a.checkIn).diff(dayjs(b.checkIn)))[0];
+
+  const checkinsThisWeek = bookings.filter(b => 
+    dayjs(b.checkIn).isBetween(startOfThisWeek, endOfThisWeek, 'day', '[]')
+  ).length;
 
   const checkoutsThisWeek = bookings.filter(b => 
     dayjs(b.checkOut).isBetween(startOfThisWeek, endOfThisWeek, 'day', '[]')
   ).length;
 
-  const checkoutsNextWeek = bookings.filter(b => 
-    dayjs(b.checkOut).isBetween(startOfNextWeek, endOfNextWeek, 'day', '[]')
-  ).length;
-
   return (
-    <Stack gap="xl">
-      <Group justify="space-between" align="flex-end">
+    <Stack gap="lg">
+      <Group justify="space-between" align="center">
         <div>
           <Title order={2} fw={800}>Benvenuto, {user?.displayName?.split(' ')[0]}</Title>
-          <Text c="dimmed">Ecco una panoramica della tua attività.</Text>
+          <Text c="dimmed">Panoramica attività Lazzaretto City Walk</Text>
         </div>
-        <ThemeIcon size={48} radius="xl" variant="light" color="violet">
-          <IconHome size={28} />
-        </ThemeIcon>
       </Group>
 
       {isAdmin ? (
-        <Grid>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Card withBorder radius="lg" p="xl" shadow="sm">
-              <Group justify="space-between" mb="lg">
-                <div>
-                  <Text size="sm" fw={700} c="dimmed" tt="uppercase">Occupazione {currentMonth.label}</Text>
-                  <Title order={3}>{currentMonth.occupied} / {currentMonth.total} notti</Title>
-                </div>
-                <RingProgress
-                  size={80}
-                  thickness={8}
-                  roundCaps
-                  sections={[{ value: currentMonth.percent, color: 'violet' }]}
-                  label={
-                    <Text ta="center" size="xs" fw={700}>
-                      {currentMonth.percent}%
-                    </Text>
-                  }
-                />
-              </Group>
-              <ProgressStack occupied={currentMonth.occupied} total={currentMonth.total} />
-            </Card>
-          </Grid.Col>
+        <Stack gap="md">
+           <Grid gutter="md">
+             {/* Occupazione Mese Corrente */}
+             <Grid.Col span={{ base: 12, md: 6 }}>
+               <Card withBorder radius="lg" p="md" shadow="sm">
+                 <Group justify="space-between" wrap="nowrap">
+                   <div>
+                     <Text size="xs" fw={700} c="dimmed" tt="uppercase">Occupazione {currentMonth.label}</Text>
+                     <Title order={4} mb={4}>{currentMonth.occupied} / {currentMonth.total} notti</Title>
+                     <ProgressStack occupied={currentMonth.occupied} total={currentMonth.total} />
+                   </div>
+                   <RingProgress
+                     size={65}
+                     thickness={6}
+                     roundCaps
+                     sections={[{ value: currentMonth.percent, color: 'violet' }]}
+                     label={<Text ta="center" size="xs" fw={700}>{currentMonth.percent}%</Text>}
+                   />
+                 </Group>
+               </Card>
+             </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Card withBorder radius="lg" p="xl" shadow="sm">
-              <Group justify="space-between" mb="lg">
-                <div>
-                  <Text size="sm" fw={700} c="dimmed" tt="uppercase">Occupazione {nextMonth.label}</Text>
-                  <Title order={3}>{nextMonth.occupied} / {nextMonth.total} notti</Title>
-                </div>
-                <RingProgress
-                  size={80}
-                  thickness={8}
-                  roundCaps
-                  sections={[{ value: nextMonth.percent, color: 'blue' }]}
-                  label={
-                    <Text ta="center" size="xs" fw={700}>
-                      {nextMonth.percent}%
-                    </Text>
-                  }
-                />
-              </Group>
-              <ProgressStack occupied={nextMonth.occupied} total={nextMonth.total} color="blue" />
-            </Card>
-          </Grid.Col>
-        </Grid>
+             {/* Occupazione Mese Prossimo */}
+             <Grid.Col span={{ base: 12, md: 6 }}>
+               <Card withBorder radius="lg" p="md" shadow="sm">
+                 <Group justify="space-between" wrap="nowrap">
+                   <div>
+                     <Text size="xs" fw={700} c="dimmed" tt="uppercase">Occupazione {nextMonth.label}</Text>
+                     <Title order={4} mb={4}>{nextMonth.occupied} / {nextMonth.total} notti</Title>
+                     <ProgressStack occupied={nextMonth.occupied} total={nextMonth.total} color="blue" />
+                   </div>
+                   <RingProgress
+                     size={65}
+                     thickness={6}
+                     roundCaps
+                     sections={[{ value: nextMonth.percent, color: 'blue' }]}
+                     label={<Text ta="center" size="xs" fw={700}>{nextMonth.percent}%</Text>}
+                   />
+                 </Group>
+               </Card>
+             </Grid.Col>
+           </Grid>
+
+           <Divider label="Tracker Settimanale Admin" labelPosition="center" color="gray.2" />
+
+           <Grid gutter="md">
+             {/* Prossimi Eventi Admin */}
+             <Grid.Col span={{ base: 12, sm: 6 }}>
+               <Paper withBorder radius="md" p="sm" shadow="xs">
+                 <Group wrap="nowrap">
+                   <ThemeIcon size="lg" radius="md" variant="light" color="green">
+                     <IconLogin size={20} />
+                   </ThemeIcon>
+                   <div style={{ flex: 1 }}>
+                     <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossimo Check-in</Text>
+                     <Text size="sm" fw={700} truncate>
+                       {nextCheckin ? dayjs(nextCheckin.checkIn).format('ddd D MMM') : 'Nessuno'}
+                     </Text>
+                     <Text size="xs" c="dimmed">{checkinsThisWeek} previsti questa sett.</Text>
+                   </div>
+                 </Group>
+               </Paper>
+             </Grid.Col>
+
+             <Grid.Col span={{ base: 12, sm: 6 }}>
+               <Paper withBorder radius="md" p="sm" shadow="xs">
+                 <Group wrap="nowrap">
+                   <ThemeIcon size="lg" radius="md" variant="light" color="red">
+                     <IconLogout size={20} />
+                   </ThemeIcon>
+                   <div style={{ flex: 1 }}>
+                     <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossimo Check-out</Text>
+                     <Text size="sm" fw={700} truncate>
+                       {nextCheckout ? dayjs(nextCheckout.checkOut).format('ddd D MMM') : 'Nessuno'}
+                     </Text>
+                     <Text size="xs" c="dimmed">{checkoutsThisWeek} previsti questa sett.</Text>
+                   </div>
+                 </Group>
+               </Paper>
+             </Grid.Col>
+           </Grid>
+        </Stack>
       ) : (
-        <Grid>
-          {/* Prossimo Checkout */}
+        <Grid gutter="md">
+          {/* Prossimo Checkout Staff */}
           <Grid.Col span={12}>
-            <Card withBorder radius="lg" p="xl" shadow="sm" style={{ background: 'var(--mantine-color-violet-light)' }}>
-              <Group gap="xl" wrap="nowrap">
-                <ThemeIcon size={56} radius="md" color="violet" variant="filled">
-                  <IconDoorExit size={32} />
+            <Card withBorder radius="lg" p="md" shadow="sm" style={{ background: 'var(--mantine-color-violet-light)' }}>
+              <Group gap="md" wrap="nowrap">
+                <ThemeIcon size={44} radius="md" color="violet" variant="filled">
+                  <IconDoorExit size={24} />
                 </ThemeIcon>
                 <div>
                   <Text size="xs" fw={700} tt="uppercase" c="violet.9">Prossimo Check-out</Text>
                   {nextCheckout ? (
                     <>
-                      <Title order={2}>{dayjs(nextCheckout.checkOut).format('dddd D MMMM')}</Title>
-                      <Text size="sm" c="violet.8">Ospite: {nextCheckout.guestName || 'Riservato'}</Text>
+                      <Text fw={800} size="md" lh={1.2}>{dayjs(nextCheckout.checkOut).format('dddd D MMMM')}</Text>
+                      <Text size="xs" c="violet.8">Ospite: {nextCheckout.guestName || 'Riservato'}</Text>
                     </>
                   ) : (
-                    <Title order={4}>Nessun check-out imminente</Title>
+                    <Text fw={700}>Nessun check-out imminente</Text>
                   )}
                 </div>
               </Group>
             </Card>
           </Grid.Col>
 
-          {/* Checkout Settimanali */}
-          <Grid.Col span={{ base: 12, sm: 6 }}>
-            <Paper withBorder radius="lg" p="lg" shadow="xs">
-              <Group wrap="nowrap">
-                <ThemeIcon size="lg" radius="md" variant="light" color="blue">
-                  <IconCalendarCheck size={20} />
+          {/* Settimanali Staff */}
+          <Grid.Col span={{ base: 6, xs: 6 }}>
+            <Paper withBorder radius="md" p="sm" shadow="xs">
+              <Group wrap="nowrap" gap="xs">
+                <ThemeIcon size="md" radius="sm" variant="light" color="blue">
+                  <IconCalendarCheck size={16} />
                 </ThemeIcon>
                 <div>
-                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Questa settimana</Text>
-                  <Title order={4}>{checkoutsThisWeek} Checkout</Title>
-                  <Text size="xs" c="dimmed">Lun {startOfThisWeek.format('DD')} - Dom {endOfThisWeek.format('DD')}</Text>
+                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Questa sett.</Text>
+                  <Text fw={700} size="sm">{checkoutsThisWeek} Out</Text>
                 </div>
               </Group>
             </Paper>
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, sm: 6 }}>
-            <Paper withBorder radius="lg" p="lg" shadow="xs">
-              <Group wrap="nowrap">
-                <ThemeIcon size="lg" radius="md" variant="light" color="teal">
-                  <IconCalendarStats size={20} />
+          <Grid.Col span={{ base: 6, xs: 6 }}>
+            <Paper withBorder radius="md" p="sm" shadow="xs">
+              <Group wrap="nowrap" gap="xs">
+                <ThemeIcon size="md" radius="sm" variant="light" color="teal">
+                  <IconCalendarStats size={16} />
                 </ThemeIcon>
                 <div>
-                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossima settimana</Text>
-                  <Title order={4}>{checkoutsNextWeek} Checkout</Title>
-                  <Text size="xs" c="dimmed">Lun {startOfNextWeek.format('DD')} - Dom {endOfNextWeek.format('DD')}</Text>
+                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossima sett.</Text>
+                  <Text fw={700} size="sm">{bookings.filter(b => 
+                    dayjs(b.checkOut).isBetween(startOfThisWeek.add(1, 'week'), endOfThisWeek.add(1, 'week'), 'day', '[]')
+                  ).length} Out</Text>
                 </div>
               </Group>
             </Paper>
@@ -201,12 +232,11 @@ export default function Home() {
 
 function ProgressStack({ occupied, total, color = "violet" }: { occupied: number, total: number, color?: string }) {
   return (
-    <Stack gap={4} mt="md">
-      <Group justify="space-between">
-        <Text size="xs" c="dimmed">Notti disponibili</Text>
-        <Text size="xs" fw={700}>{total - occupied} notti</Text>
-      </Group>
-      <div style={{ height: 6, background: 'var(--mantine-color-gray-2)', borderRadius: 3, overflow: 'hidden' }}>
+    <Stack gap={2} mt="xs">
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Text size="10px" c="dimmed">Libere: {total - occupied}</Text>
+      </div>
+      <div style={{ height: 4, background: 'var(--mantine-color-gray-2)', borderRadius: 2, overflow: 'hidden', width: '100px' }}>
         <div style={{ 
           height: '100%', 
           width: `${(occupied / total) * 100}%`, 

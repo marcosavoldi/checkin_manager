@@ -30,7 +30,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { label: 'Home', icon: <IconHome size={16} />, path: '/home' },
-    { label: 'Dashboard', icon: <IconLayoutDashboard size={16} />, path: '/' },
+    { label: 'Prenotazioni', icon: <IconLayoutDashboard size={16} />, path: '/' },
     ...(user.appRole === 'admin'
       ? [{ label: 'Gestione Prenotazioni', icon: <IconCalendarPlus size={16} />, path: '/gestione' }]
       : [])
