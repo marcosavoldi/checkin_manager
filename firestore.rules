@@ -31,6 +31,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Whitelist Admin
+    match /authorized_admins/{adminId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
     // Collezione Inventario (Biancheria)
     match /inventory/{docId} {
       allow read: if isAuthenticated();
