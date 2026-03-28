@@ -127,6 +127,9 @@ export default function Dashboard() {
   const dayBookings = selectedDay ? getBookingsForDay(bookings, selectedDay) : [];
 
   const handleDayClick = (date: Date) => {
+    // Lo staff non può cliccare sul passato
+    if (!isAdmin && dayjs(date).isBefore(today, 'day')) return;
+
     const isCheckIn = bookings.some(b => dayjs(date).isSame(dayjs(b.checkIn), 'day'));
     const isCheckOut = bookings.some(b => dayjs(date).isSame(dayjs(b.checkOut), 'day'));
     if (isCheckIn || isCheckOut) {
@@ -137,6 +140,8 @@ export default function Dashboard() {
 
   return (
     <Box>
+      {/* ... (rest of the header/tabs unchanged) */}
+      
       {/* ── Header ─────────────────────────────── */}
       <Group justify="space-between" mb="md" align="center" wrap="nowrap">
         <Group gap="sm" align="center">
@@ -300,12 +305,22 @@ export default function Dashboard() {
               style={{ width: '100%' }}
               renderDay={(date) => {
                 const d = dayjs(date).toDate();
-                // Se lo staff, consideriamo solo prenotazioni future per i marker
-                const relevantBookings = isAdmin ? bookings : bookings.filter(b => dayjs(b.checkOut).isAfter(today.subtract(1, 'ms')));
+                const isPast = dayjs(d).isBefore(today, 'day');
+                
+                // Se staff, nascondiamo i puntini del passato
+                const relevantBookings = (isAdmin) 
+                  ? bookings 
+                  : bookings.filter(b => !dayjs(b.checkIn).isBefore(today, 'day') || !dayjs(b.checkOut).isBefore(today, 'day'));
                 
                 const isCheckIn = relevantBookings.some(b => dayjs(d).isSame(dayjs(b.checkIn), 'day'));
                 const isCheckOut = relevantBookings.some(b => dayjs(d).isSame(dayjs(b.checkOut), 'day'));
+                
+                // Per lo staff, i marker compaiono solo oggi o nel futuro
+                const showMarkers = isAdmin || !isPast;
+                
                 const isToday = dayjs(d).isSame(dayjs(), 'day');
+                const canClick = (isCheckIn || isCheckOut) && (isAdmin || !isPast);
+
                 return (
                   <Stack
                     gap={2}
@@ -315,20 +330,21 @@ export default function Dashboard() {
                       position: 'relative',
                       width: '100%',
                       height: '100%',
-                      cursor: (isCheckIn || isCheckOut) ? 'pointer' : 'default',
+                      cursor: canClick ? 'pointer' : 'default',
                       borderRadius: 8,
                       fontWeight: isToday ? 700 : undefined,
                       background: isToday ? 'var(--mantine-color-violet-light)' : undefined,
-                      padding: 4
+                      padding: 4,
+                      opacity: (!isAdmin && isPast) ? 0.4 : 1
                     }}
                     onClick={() => handleDayClick(d)}
                   >
                     <Text size="sm" fw={isToday ? 700 : 500}>{d.getDate()}</Text>
                     <Group gap={2} justify="center" h={4} w="100%" wrap="nowrap">
-                      {isCheckIn && (
+                      {showMarkers && isCheckIn && (
                         <Box style={{ height: 3, flex: 1, maxWidth: 12, borderRadius: 2, background: 'var(--mantine-color-green-6)' }} />
                       )}
-                      {isCheckOut && (
+                      {showMarkers && isCheckOut && (
                         <Box style={{ height: 3, flex: 1, maxWidth: 12, borderRadius: 2, background: 'var(--mantine-color-red-6)' }} />
                       )}
                     </Group>
@@ -336,7 +352,9 @@ export default function Dashboard() {
                 );
               }}
             />
-            <Text ta="center" size="xs" c="dimmed" mt="md">Clicca su un giorno con barre colorate per vedere i dettagli</Text>
+            <Text ta="center" size="xs" c="dimmed" mt="md">
+              {isAdmin ? 'Clicca su un giorno con barre colorate' : 'Puoi vedere solo check-in da oggi in avanti'}
+            </Text>
           </Box>
         </Box>
       )}
