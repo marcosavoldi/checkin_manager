@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import {
   Title, Button, Group, Stack, Text, Card, Badge,
   Modal, TextInput, Textarea, Select, ActionIcon, Tooltip,
-  Box, Divider, ThemeIcon, Paper, NumberInput, SegmentedControl, Center
+  Box, Divider, ThemeIcon, Paper, NumberInput, SegmentedControl, Center, Affix
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout, IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, addBooking, updateBooking, deleteBooking, type Booking, type BookingSource } from '../services/bookingService';
 import dayjs from 'dayjs';
@@ -123,15 +123,23 @@ export default function ManageBookings() {
           <Title order={3} fw={700}>Gestione Prenotazioni</Title>
           <Text size="sm" c="dimmed">Inserisci e modifica le prenotazioni manualmente.</Text>
         </div>
-        <Button
-          leftSection={<IconCalendarPlus size={16} />}
-          onClick={openAdd}
-          size="sm"
-          radius="md"
-        >
-          Aggiungi
-        </Button>
       </Group>
+
+      <Affix position={{ bottom: 20, right: 20 }}>
+        <ActionIcon
+          size={60}
+          radius="xl"
+          variant="filled"
+          color="blue"
+          onClick={openAdd}
+          style={{ 
+            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+            zIndex: 100
+          }}
+        >
+          <IconPlus size={30} stroke={2.5} />
+        </ActionIcon>
+      </Affix>
 
       <Center mb="lg">
         <SegmentedControl
