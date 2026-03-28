@@ -140,16 +140,16 @@ export default function StaffManagement() {
 
         {/* --- Sezione Admin Whitelist --- */}
         <Paper withBorder radius="lg" p="md" shadow="sm" style={{ 
-          background: 'rgba(255, 255, 255, 0.03)',
+          background: 'var(--mantine-color-body)',
           backdropFilter: 'blur(10px)',
-          borderColor: 'rgba(255, 255, 255, 0.1)' 
+          borderColor: 'var(--mantine-color-default-border)' 
         }}>
           <Group justify="space-between" mb="md">
             <Group gap="xs">
               <ThemeIcon color="violet" size="md" radius="sm" variant="light">
                 <IconShieldCheck size={18} />
               </ThemeIcon>
-              <Text fw={700} size="sm">Admin Authorized</Text>
+              <Text fw={700} size="sm">Admin Autorizzati</Text>
             </Group>
             <Button 
               variant="light" 
@@ -158,7 +158,7 @@ export default function StaffManagement() {
               onClick={openAdmin} 
               radius="sm"
             >
-              Add
+              Aggiungi
             </Button>
           </Group>
 
@@ -169,8 +169,9 @@ export default function StaffManagement() {
                 p={8} 
                 style={{ 
                   borderRadius: '8px',
-                  background: 'rgba(0, 0, 0, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)'
+                  background: 'var(--mantine-color-dark-filled)',
+                  border: '1px solid var(--mantine-color-default-border)',
+                  opacity: 0.9
                 }}
               >
                 <Group justify="space-between">
@@ -182,16 +183,16 @@ export default function StaffManagement() {
               </Box>
             ))}
             {admins.length === 0 && (
-              <Text size="xs" c="dimmed" ta="center" py="xs">No admins whitelisted.</Text>
+              <Text size="xs" c="dimmed" ta="center" py="xs">Nessun admin autorizzato.</Text>
             )}
           </Stack>
         </Paper>
 
         {/* --- Sezione Staff --- */}
         <Paper withBorder radius="lg" p="md" shadow="sm" style={{ 
-          background: 'rgba(255, 255, 255, 0.03)',
+          background: 'var(--mantine-color-body)',
           backdropFilter: 'blur(10px)',
-          borderColor: 'rgba(255, 255, 255, 0.1)' 
+          borderColor: 'var(--mantine-color-default-border)' 
         }}>
           <Group justify="space-between" mb="md">
             <Group gap="xs">
@@ -218,8 +219,9 @@ export default function StaffManagement() {
                 p={8} 
                 style={{ 
                   borderRadius: '8px',
-                  background: 'rgba(0, 0, 0, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)'
+                  background: 'var(--mantine-color-dark-filled)',
+                  border: '1px solid var(--mantine-color-default-border)',
+                  opacity: 0.9
                 }}
               >
                 <Group justify="space-between" wrap="nowrap">
@@ -234,7 +236,7 @@ export default function StaffManagement() {
               </Box>
             ))}
             {staff.length === 0 && (
-              <Text size="xs" c="dimmed" ta="center" py="xs">No staff accounts configured.</Text>
+              <Text size="xs" c="dimmed" ta="center" py="xs">Nessun membro dello staff configurato.</Text>
             )}
           </Stack>
         </Paper>
