@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { 
   Title, Text, Button, Group, Stack, 
   ActionIcon, Modal, TextInput, PasswordInput,
-  Paper, ThemeIcon, Container, Box, Tooltip
+  Paper, ThemeIcon, Container, Box
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { 
-  IconUserPlus, IconTrash, IconMail, IconLock, 
+  IconTrash, IconMail, IconLock, 
   IconShieldCheck, IconUserCircle, IconBrandGoogle 
 } from '@tabler/icons-react';
 import { 
@@ -130,195 +130,168 @@ export default function StaffManagement() {
   };
 
   return (
-    <Container size="md" py="xl">
-      <Stack gap="xl">
-        <Box mb="md">
-          <Title order={1} fw={900} size={38} style={{ letterSpacing: -1.5 }}>
+    <Container size="md" py="md" px="xs">
+      <Stack gap="md">
+        <Box mb={5}>
+          <Title order={2} fw={900} size={28} style={{ letterSpacing: -1 }}>
             Gestione Accessi
           </Title>
-          <Text c="dimmed" size="sm">
-            Amministra il personale e le autorizzazioni di sicurezza.
-          </Text>
         </Box>
 
         {/* --- Sezione Admin Whitelist --- */}
-        <Paper withBorder radius="xl" p="xl" shadow="sm" style={{ 
+        <Paper withBorder radius="lg" p="md" shadow="sm" style={{ 
           background: 'rgba(255, 255, 255, 0.03)',
           backdropFilter: 'blur(10px)',
           borderColor: 'rgba(255, 255, 255, 0.1)' 
         }}>
-          <Group justify="space-between" mb="xl">
-            <Group gap="md">
-              <ThemeIcon color="violet" size={48} radius="lg" variant="filled">
-                <IconShieldCheck size={28} />
+          <Group justify="space-between" mb="md">
+            <Group gap="xs">
+              <ThemeIcon color="violet" size="md" radius="sm" variant="light">
+                <IconShieldCheck size={18} />
               </ThemeIcon>
-              <div>
-                <Text fw={800} size="lg">Admin Autorizzati</Text>
-                <Text size="xs" c="dimmed">Whitelist Gmail per accesso Google</Text>
-              </div>
+              <Text fw={700} size="sm">Admin Authorized</Text>
             </Group>
             <Button 
-              variant="white" 
+              variant="light" 
               color="violet" 
-              size="sm" 
+              size="compact-xs" 
               onClick={openAdmin} 
-              radius="md"
-              leftSection={<IconUserPlus size={16} />}
+              radius="sm"
             >
-              Aggiungi Admin
+              Add
             </Button>
           </Group>
 
-          <Stack gap="sm">
-            {admins.map(a => (
+          <Stack gap={5}>
+            {admins.map((a: AuthorizedAdmin) => (
               <Box 
                 key={a.id} 
-                p="md" 
+                p={8} 
                 style={{ 
-                  borderRadius: '12px',
-                  background: 'rgba(0, 0, 0, 0.2)',
+                  borderRadius: '8px',
+                  background: 'rgba(0, 0, 0, 0.15)',
                   border: '1px solid rgba(255, 255, 255, 0.05)'
                 }}
               >
                 <Group justify="space-between">
-                  <Group gap="md">
-                    <ThemeIcon color="violet" variant="light" size="sm">
-                      <IconMail size={14} />
-                    </ThemeIcon>
-                    <Text size="sm" fw={600}>{a.email}</Text>
-                  </Group>
-                  <Tooltip label="Revoca autorizzazione">
-                    <ActionIcon variant="subtle" color="red" onClick={() => handleDeleteAdmin(a.id)}>
-                      <IconTrash size={16} />
-                    </ActionIcon>
-                  </Tooltip>
+                  <Text size="xs" fw={500} truncate>{a.email}</Text>
+                  <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDeleteAdmin(a.id)}>
+                    <IconTrash size={14} />
+                  </ActionIcon>
                 </Group>
               </Box>
             ))}
             {admins.length === 0 && (
-              <Paper withBorder p="xl" radius="lg" style={{ borderStyle: 'dashed', background: 'transparent' }}>
-                <Text size="sm" c="dimmed" ta="center">Nessun admin autorizzato. Aggiungi il tuo email!</Text>
-              </Paper>
+              <Text size="xs" c="dimmed" ta="center" py="xs">No admins whitelisted.</Text>
             )}
           </Stack>
         </Paper>
 
         {/* --- Sezione Staff --- */}
-        <Paper withBorder radius="xl" p="xl" shadow="sm" style={{ 
+        <Paper withBorder radius="lg" p="md" shadow="sm" style={{ 
           background: 'rgba(255, 255, 255, 0.03)',
           backdropFilter: 'blur(10px)',
           borderColor: 'rgba(255, 255, 255, 0.1)' 
         }}>
-          <Group justify="space-between" mb="xl">
-            <Group gap="md">
-              <ThemeIcon color="blue" size={48} radius="lg" variant="filled">
-                <IconUserCircle size={28} />
+          <Group justify="space-between" mb="md">
+            <Group gap="xs">
+              <ThemeIcon color="blue" size="md" radius="sm" variant="light">
+                <IconUserCircle size={18} />
               </ThemeIcon>
-              <div>
-                <Text fw={800} size="lg">Accrediti Staff</Text>
-                <Text size="xs" c="dimmed">Accesso tramite Email e Password</Text>
-              </div>
+              <Text fw={700} size="sm">Accrediti Staff</Text>
             </Group>
             <Button 
               variant="filled" 
               color="blue" 
-              size="sm" 
+              size="compact-xs" 
               onClick={open} 
-              radius="md"
-              leftSection={<IconUserPlus size={16} />}
+              radius="sm"
             >
-              Crea Staff
+              Crea
             </Button>
           </Group>
 
-          <Stack gap="sm">
-            {staff.map(s => (
+          <Stack gap={5}>
+            {staff.map((s: StaffUser) => (
               <Box 
                 key={s.id} 
-                p="md" 
+                p={8} 
                 style={{ 
-                  borderRadius: '12px',
-                  background: 'rgba(0, 0, 0, 0.2)',
+                  borderRadius: '8px',
+                  background: 'rgba(0, 0, 0, 0.15)',
                   border: '1px solid rgba(255, 255, 255, 0.05)'
                 }}
               >
-                <Group justify="space-between">
-                  <Group gap="md">
-                    <ThemeIcon color="blue" variant="light" size="sm">
-                      <IconUserCircle size={14} />
-                    </ThemeIcon>
-                    <div>
-                      <Text fw={700} size="sm">{s.name}</Text>
-                      <Text size="xs" c="dimmed">{s.email}</Text>
-                    </div>
-                  </Group>
-                  <Tooltip label="Elimina account">
-                    <ActionIcon variant="subtle" color="red" onClick={() => handleDeleteStaff(s.id, s.email)}>
-                      <IconTrash size={16} />
-                    </ActionIcon>
-                  </Tooltip>
+                <Group justify="space-between" wrap="nowrap">
+                  <Box style={{ overflow: 'hidden' }}>
+                    <Text fw={600} size="xs" truncate>{s.name}</Text>
+                    <Text size="10px" c="dimmed" truncate>{s.email}</Text>
+                  </Box>
+                  <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDeleteStaff(s.id, s.email)}>
+                    <IconTrash size={14} />
+                  </ActionIcon>
                 </Group>
               </Box>
             ))}
             {staff.length === 0 && (
-              <Paper withBorder p="xl" radius="lg" style={{ borderStyle: 'dashed', background: 'transparent' }}>
-                <Text size="sm" c="dimmed" ta="center">Nessun membro dello staff configurato.</Text>
-              </Paper>
+              <Text size="xs" c="dimmed" ta="center" py="xs">No staff accounts configured.</Text>
             )}
           </Stack>
         </Paper>
 
         {/* --- Modale Aggiungi Staff --- */}
-        <Modal opened={opened} onClose={close} title="Nuovo Collaboratore" centered radius="xl" overlayProps={{ blur: 10 }}>
-          <Stack gap="md">
+        <Modal opened={opened} onClose={close} title="Nuovo Collaboratore" centered radius="lg" size="sm" overlayProps={{ blur: 10 }}>
+          <Stack gap="sm">
             <TextInput 
               label="Nome" 
               placeholder="es. Mario Rossi" 
+              size="sm"
               required
               value={newStaff.name}
-              onChange={(e) => setNewStaff(s => ({ ...s, name: e.currentTarget.value }))}
+              onChange={(e) => setNewStaff((prev) => ({ ...prev, name: e.currentTarget.value }))}
               radius="md"
             />
             <TextInput 
               label="Email / Login" 
               placeholder="mario@lazzaretto.it" 
+              size="sm"
               required 
-              leftSection={<IconMail size={16} />}
+              leftSection={<IconMail size={14} />}
               value={newStaff.email}
-              onChange={(e) => setNewStaff(s => ({ ...s, email: e.currentTarget.value }))}
+              onChange={(e) => setNewStaff((prev) => ({ ...prev, email: e.currentTarget.value }))}
               radius="md"
-              description="Verrà usata come nome utente per il login"
             />
             <PasswordInput 
               label="Password iniziale" 
               placeholder="Minimo 6 caratteri" 
+              size="sm"
               required 
-              leftSection={<IconLock size={16} />}
+              leftSection={<IconLock size={14} />}
               value={newStaff.password}
-              onChange={(e) => setNewStaff(s => ({ ...s, password: e.currentTarget.value }))}
+              onChange={(e) => setNewStaff((prev) => ({ ...prev, password: e.currentTarget.value }))}
               radius="md"
             />
-            <Button fullWidth onClick={handleAddStaff} loading={saving} mt="lg" radius="md" size="md">
+            <Button fullWidth onClick={handleAddStaff} loading={saving} mt="md" radius="md" size="sm">
               Crea Account
             </Button>
           </Stack>
         </Modal>
 
         {/* --- Modale Aggiungi Admin --- */}
-        <Modal opened={adminOpened} onClose={closeAdmin} title="Autorizza Admin Gmail" centered radius="xl" overlayProps={{ blur: 10 }}>
-          <Stack gap="md">
+        <Modal opened={adminOpened} onClose={closeAdmin} title="Autorizza Admin Gmail" centered radius="lg" size="sm" overlayProps={{ blur: 10 }}>
+          <Stack gap="sm">
             <TextInput 
               label="Indirizzo Gmail" 
               placeholder="utente@gmail.com" 
+              size="sm"
               required 
-              leftSection={<IconBrandGoogle size={16} />}
+              leftSection={<IconBrandGoogle size={14} />}
               value={newAdminEmail}
               onChange={(e) => setNewAdminEmail(e.currentTarget.value)}
               radius="md"
-              description="Assicurati che sia un indirizzo Gmail valido"
             />
-            <Button fullWidth onClick={handleAddAdmin} loading={saving} mt="lg" radius="md" size="md" color="violet">
-              Autorizza Accesso
+            <Button fullWidth onClick={handleAddAdmin} loading={saving} mt="md" radius="md" size="sm" color="violet">
+              Autorizza
             </Button>
           </Stack>
         </Modal>
