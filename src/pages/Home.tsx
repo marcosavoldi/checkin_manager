@@ -24,6 +24,15 @@ export default function Home() {
   const loadAll = async () => {
     setLoading(true);
     try {
+      let bkngs: Booking[] = [];
+      let inv: LinenInventory | null = null;
+      
+      try {
+        bkngs = await fetchUpcomingBookings();
+      } catch (err) {
+        console.error('Fetch bookings failed:', err);
+      }
+
       try {
         inv = await getLinenInventory();
       } catch (err) {
