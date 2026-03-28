@@ -1,7 +1,7 @@
 import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Text as MantineText, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconShirt } from '@tabler/icons-react';
+import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconBed } from '@tabler/icons-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -35,7 +35,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     ...(user.appRole === 'admin'
       ? [
           { label: 'Gestione Prenotazioni', icon: <IconCalendarPlus size={16} />, path: '/gestione' },
-          { label: 'Gestione Biancheria', icon: <IconShirt size={16} />, path: '/biancheria' }
+          { label: 'Gestione Biancheria', icon: <IconBed size={16} />, path: '/biancheria' }
         ]
       : [])
   ];
