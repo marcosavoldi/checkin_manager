@@ -48,11 +48,13 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
             <Image
               src={computedColorScheme === 'light' ? '/Logo.jpg' : '/Logo1.png'}
-              h={44}
-              w="auto"
-              fit="contain"
+              h={28}
+              fallbackSrc="/appicon.png"
             />
-            <MantineText fw={700} size="lg" visibleFrom="xs">Lazzaretto City Walk</MantineText>
+            <MantineText fw={700} size="sm" style={{ letterSpacing: -0.2 }} hiddenFrom="xs">LCW</MantineText>
+            <MantineText fw={800} size="md" style={{ letterSpacing: -0.5 }} visibleFrom="xs">
+              Lazzaretto City Walk
+            </MantineText>
           </Group>
           
           <Group gap={10}>
