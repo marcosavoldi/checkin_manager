@@ -1,12 +1,13 @@
 import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Text as MantineText, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome } from '@tabler/icons-react';
+import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconShirt } from '@tabler/icons-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ManageBookings from './pages/ManageBookings';
 import Home from './pages/Home';
+import LinenManagement from './pages/LinenManagement';
 
 function ProtectedRoute({ children, adminOnly }: { children: React.ReactNode, adminOnly?: boolean }) {
   const { user, loading } = useAuth();
@@ -32,7 +33,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     { label: 'Home', icon: <IconHome size={16} />, path: '/' },
     { label: 'Prenotazioni', icon: <IconLayoutDashboard size={16} />, path: '/prenotazioni' },
     ...(user.appRole === 'admin'
-      ? [{ label: 'Gestione Prenotazioni', icon: <IconCalendarPlus size={16} />, path: '/gestione' }]
+      ? [
+          { label: 'Gestione Prenotazioni', icon: <IconCalendarPlus size={16} />, path: '/gestione' },
+          { label: 'Gestione Biancheria', icon: <IconShirt size={16} />, path: '/biancheria' }
+        ]
       : [])
   ];
 
@@ -120,6 +124,7 @@ export default function App() {
                 <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                 <Route path="/prenotazioni" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/gestione" element={<ProtectedRoute adminOnly><ManageBookings /></ProtectedRoute>} />
+                <Route path="/biancheria" element={<ProtectedRoute adminOnly><LinenManagement /></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </MainLayout>

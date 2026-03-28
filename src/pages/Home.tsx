@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider } from '@mantine/core';
+import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid } from '@mantine/core';
 import { IconCalendarCheck, IconCalendarStats, IconDoorExit, IconLogin, IconLogout } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
@@ -169,36 +169,32 @@ export default function Home() {
             <Divider label="Tracker Settimanale Admin" labelPosition="center" color="gray.2" />
 
             {inventory && (
-              <Grid gutter="md">
-                <Grid.Col span={12}>
-                  <Paper withBorder radius="lg" p="md" shadow="sm">
-                    <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb="md">Inventario Biancheria Pulita</Text>
-                    <Group grow gap="xl">
-                      <Group gap="md">
-                        <ThemeIcon size={44} radius="md" color="blue" variant="light">
-                          <IconLogout size={24} />
-                        </ThemeIcon>
-                        <div>
-                          <Text size="xs" c="dimmed">Kit Letto</Text>
-                          <Title order={3}>{inventory.bedKits}</Title>
-                        </div>
-                      </Group>
-                      <Group gap="md">
-                        <ThemeIcon size={44} radius="md" color="teal" variant="light">
-                          <IconLogin size={24} />
-                        </ThemeIcon>
-                        <div>
-                          <Text size="xs" c="dimmed">Kit Asciugamani</Text>
-                          <Title order={3}>{inventory.towelKits}</Title>
-                        </div>
-                      </Group>
-                    </Group>
-                    <Text size="10px" c="dimmed" mt="xs" ta="right">
-                      Aggiornato: {dayjs(inventory.lastUpdated?.toDate ? inventory.lastUpdated.toDate() : inventory.lastUpdated).format('HH:mm [del] DD MMM')}
-                    </Text>
-                  </Paper>
-                </Grid.Col>
-              </Grid>
+              <Paper withBorder radius="lg" p="md" shadow="sm">
+                <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb="md">Inventario Biancheria Pulita</Text>
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
+                  <Group gap="md">
+                    <ThemeIcon size={44} radius="md" color="blue" variant="light">
+                      <IconLogout size={24} />
+                    </ThemeIcon>
+                    <div>
+                      <Text size="xs" c="dimmed">Kit Letto</Text>
+                      <Title order={3}>{inventory.bedKits}</Title>
+                    </div>
+                  </Group>
+                  <Group gap="md">
+                    <ThemeIcon size={44} radius="md" color="teal" variant="light">
+                      <IconLogin size={24} />
+                    </ThemeIcon>
+                    <div>
+                      <Text size="xs" c="dimmed">Kit Asciugamani</Text>
+                      <Title order={3}>{inventory.towelKits}</Title>
+                    </div>
+                  </Group>
+                </SimpleGrid>
+                <Text size="10px" c="dimmed" mt="xs" ta="right">
+                  Aggiornato: {dayjs(inventory.lastUpdated?.toDate ? inventory.lastUpdated.toDate() : inventory.lastUpdated).format('HH:mm [del] DD MMM')}
+                </Text>
+              </Paper>
             )}
 
            <Grid gutter="md">
