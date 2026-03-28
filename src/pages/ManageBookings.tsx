@@ -7,7 +7,7 @@ import {
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout, IconShirt, IconPlus, IconCheck } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout, IconShirt, IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import {
   fetchUpcomingBookings,
