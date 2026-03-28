@@ -58,13 +58,12 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           <Group gap={10}>
             <Tooltip label="Home">
               <ActionIcon
-                variant={location.pathname === '/' ? 'light' : 'subtle'}
-                color="violet"
+                variant="default"
                 size="lg"
                 onClick={() => navigate('/')}
                 radius="md"
               >
-                <IconHome size={20} />
+                <IconHome size={20} stroke={1.5} />
               </ActionIcon>
             </Tooltip>
 
