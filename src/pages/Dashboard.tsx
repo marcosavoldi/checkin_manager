@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
   Title, Text, Button, Grid, Card, Badge, Group, Stack,
-  Tabs, Modal, Box, ThemeIcon, Avatar, Paper
+  Tabs, Modal, Box, ThemeIcon, Avatar, Paper, Collapse
 } from '@mantine/core';
 import { Calendar } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconCalendar, IconLayoutGrid, IconLogin, IconLogout,
-  IconArrowRight
+  IconArrowRight, IconUsers, IconChevronDown, IconChevronUp
 } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, type Booking, type BookingSource } from '../services/bookingService';
@@ -36,6 +36,39 @@ function getBookingsForDay(bookings: Booking[], date: Date) {
   const d = dayjs(date);
   return bookings.filter(b =>
     d.isSame(dayjs(b.checkIn), 'day') || d.isSame(dayjs(b.checkOut), 'day')
+  );
+}
+
+const NOTE_THRESHOLD = 120;
+
+function StaffNote({ note }: { note: string }) {
+  const [expanded, setExpanded] = useState(false);
+  if (!note) return null;
+  const isLong = note.length > NOTE_THRESHOLD;
+  return (
+    <Box mt={6}>
+      <Group gap={4} mb={2}>
+        <IconUsers size={12} color="var(--mantine-color-blue-6)" />
+        <Text size="xs" fw={600} c="blue">Nota Staff</Text>
+      </Group>
+      {isLong ? (
+        <>
+          <Collapse in={expanded}>
+            <Text size="xs" c="dimmed">{note}</Text>
+          </Collapse>
+          {!expanded && <Text size="xs" c="dimmed" lineClamp={2}>{note}</Text>}
+          <Button
+            size="compact-xs" variant="subtle" color="blue" mt={2}
+            rightSection={expanded ? <IconChevronUp size={10} /> : <IconChevronDown size={10} />}
+            onClick={() => setExpanded(e => !e)}
+          >
+            {expanded ? 'Meno' : 'Leggi tutto'}
+          </Button>
+        </>
+      ) : (
+        <Text size="xs" c="dimmed">{note}</Text>
+      )}
+    </Box>
   );
 }
 
@@ -128,12 +161,13 @@ export default function Dashboard() {
                         Prenotazione
                       </Badge>
                     )}
-                    <Text size="xs" c="dimmed" fw={500}>
-                      {b.adults}A {b.children > 0 && `+ ${b.children}B`}
+                    <Text size="xs" c="dimmed" fw={600}>
+                      <IconUsers size={11} style={{ verticalAlign: 'middle', marginRight: 3 }} />
+                      {b.adults} adulti{b.children > 0 ? ` + ${b.children} bambini` : ''}
                     </Text>
                   </Group>
 
-                  <Stack gap={6} mb="md">
+                  <Stack gap={6} mb="xs">
                     <Text size="sm" fw={700} truncate>
                       {isAdmin ? (b.guestName || 'Ospite') : 'Dettagli Prenotazione'}
                     </Text>
@@ -161,9 +195,11 @@ export default function Dashboard() {
                         {dayjs(b.checkOut).format('ddd DD MMM')}
                       </Text>
                     </Group>
+
+                    {b.staffNote && <StaffNote note={b.staffNote} />}
                   </Stack>
 
-                  <Button fullWidth size="xs" variant="light" color="violet" onClick={() => setSelectedBooking(b)}>
+                  <Button fullWidth size="xs" variant="light" color="violet" mt="xs" onClick={() => setSelectedBooking(b)}>
                     Note & Dettagli
                   </Button>
                 </Card>
@@ -265,10 +301,17 @@ export default function Dashboard() {
                     {isCheckOut && <Badge color="red" variant="dot" size="sm">Check-out</Badge>}
                   </Group>
                 </Group>
-                {isAdmin && b.guestName && <Text size="sm" fw={500}>{b.guestName}</Text>}
+                {isAdmin && b.guestName && <Text size="sm" fw={600}>{b.guestName}</Text>}
+                <Group gap={6} mt={4}>
+                  <IconUsers size={13} color="var(--mantine-color-dimmed)" />
+                  <Text size="xs" c="dimmed">
+                    {b.adults} adulti{b.children > 0 ? ` + ${b.children} bambini` : ''}
+                  </Text>
+                </Group>
                 <Text size="xs" c="dimmed" mt={4}>
                   {dayjs(b.checkIn).format('DD MMM')} → {dayjs(b.checkOut).format('DD MMM YYYY')}
                 </Text>
+                {b.staffNote && <StaffNote note={b.staffNote} />}
                 <Button
                   fullWidth mt="sm" size="xs" variant="light" color="violet"
                   onClick={() => { closeDayModal(); setSelectedBooking(b); }}
