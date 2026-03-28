@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import {
   Title, Button, Group, Stack, Text, Divider, ThemeIcon, Paper, NumberInput, SimpleGrid, Container, useComputedColorScheme
 } from '@mantine/core';
-import { IconBed, IconBath, IconRefresh, IconAlertCircle } from '@tabler/icons-react';
-import { getLinenInventory, addCleanLinen, setLinenInventory, type LinenInventory } from '../services/inventoryService';
+import { IconBed, IconBath, IconAlertCircle } from '@tabler/icons-react';
+import { getLinenInventory, addCleanLinen, type LinenInventory } from '../services/inventoryService';
 import dayjs from 'dayjs';
 
 export default function LinenManagement() {
@@ -44,19 +44,6 @@ export default function LinenManagement() {
     }
   };
 
-  const handleResetInventory = async () => {
-    const b = prompt('Inserisci il nuovo totale Kit Letto disponibili ORA:');
-    const t = prompt('Inserisci il nuovo totale Kit Asciugamani disponibili ORA:');
-    if (b !== null && t !== null) {
-      setInvLoading(true);
-      try {
-        await setLinenInventory(Number(b), Number(t));
-        await load();
-      } finally {
-        setInvLoading(false);
-      }
-    }
-  };
 
   if (loading) return <Text c="dimmed" ta="center" py="xl">Caricamento inventario...</Text>;
 
@@ -68,30 +55,21 @@ export default function LinenManagement() {
             <Title order={1} fw={900} lts="-1px" c="var(--mantine-color-text)">Biancheria</Title>
             <Text c="dimmed" size="sm" fw={500}>Gestione stock e rientri lavanderia</Text>
           </div>
-          <Button 
-            variant="subtle" 
-            color="gray" 
-            radius="xl"
-            leftSection={<IconRefresh size={18} />} 
-            onClick={load}
-          >
-            Aggiorna
-          </Button>
         </Group>
 
         {inventory && (
           <Stack gap="lg">
-            {/* 1. SEZIONE CARICO (Ultra-compatta) */}
+            {/* 1. SEZIONE CARICO (Responsiva) */}
             <Paper withBorder p="lg" radius="24px" shadow="md" style={glassStyles}>
               <Stack gap="md">
                 <Title order={5} tt="uppercase" lts="1px" c="dimmed" ta="center">Registra Rientro Lavanderia</Title>
                 
-                <Group grow wrap="nowrap" align="flex-end" gap="xs">
+                <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
                   <NumberInput 
                     label="Kit Letto" 
                     placeholder="0"
                     min={0} 
-                    size="sm"
+                    size="md"
                     radius="md"
                     value={addBeds} 
                     onChange={setAddBeds}
@@ -100,23 +78,25 @@ export default function LinenManagement() {
                     label="Kit Asciugamani" 
                     placeholder="0"
                     min={0} 
-                    size="sm"
+                    size="md"
                     radius="md"
                     value={addTowels} 
                     onChange={setAddTowels}
                   />
-                  <Button 
-                    variant="filled" 
-                    color="teal" 
-                    size="sm"
-                    radius="md"
-                    onClick={handleRestock} 
-                    loading={invLoading}
-                    disabled={!addBeds && !addTowels}
-                  >
-                    Carica
-                  </Button>
-                </Group>
+                </SimpleGrid>
+                
+                <Button 
+                  variant="filled" 
+                  color="teal" 
+                  size="md"
+                  radius="md"
+                  fullWidth
+                  onClick={handleRestock} 
+                  loading={invLoading}
+                  disabled={!addBeds && !addTowels}
+                >
+                  Carica Kit Puliti
+                </Button>
               </Stack>
             </Paper>
 
@@ -133,7 +113,7 @@ export default function LinenManagement() {
 
             <Divider label="Riepilogo Disponibilità" labelPosition="center" color="gray.2" />
 
-            {/* 2. STATO INVENTARIO (Più compatto, in basso) */}
+            {/* 2. STATO INVENTARIO */}
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
               <Paper 
                 withBorder 
@@ -182,20 +162,10 @@ export default function LinenManagement() {
               </Paper>
             </SimpleGrid>
 
-            <Group justify="space-between" align="center" mt="xs">
+            <Group justify="center" mt="xs">
               <Text size="xs" c="dimmed" fw={500}>
                 Ultimo aggiornamento: {dayjs(inventory.lastUpdated?.toDate ? inventory.lastUpdated.toDate() : inventory.lastUpdated).format('DD MMM, HH:mm')}
               </Text>
-              <Button 
-                variant="subtle" 
-                color="gray" 
-                size="xs" 
-                radius="xl"
-                onClick={handleResetInventory}
-                leftSection={<IconRefresh size={14} />}
-              >
-                Rettifica Manuale
-              </Button>
             </Group>
           </Stack>
         )}
