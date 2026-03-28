@@ -33,13 +33,14 @@ const COLLECTION = 'bookings';
 
 export async function fetchUpcomingBookings(): Promise<Booking[]> {
   const ref = collection(db, COLLECTION);
-  // Mostriamo prenotazioni che non siano terminate più di 7 giorni fa
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  // Mostriamo prenotazioni che non siano terminate più di 90 giorni fa (circa 3 mesi)
+  // Nota: Firebase mantiene tutti i dati per sempre, questo è solo un filtro di caricamento.
+  const limitDate = new Date();
+  limitDate.setDate(limitDate.getDate() - 90);
 
   const q = query(
     ref,
-    where('checkOut', '>=', Timestamp.fromDate(sevenDaysAgo)),
+    where('checkOut', '>=', Timestamp.fromDate(limitDate)),
     orderBy('checkOut', 'asc')
   );
 
