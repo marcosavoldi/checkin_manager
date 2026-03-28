@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Title, Button, Group, Stack, Text, Card, Badge,
   Modal, TextInput, Textarea, Select, ActionIcon, Tooltip,
-  Box, Divider, ThemeIcon, Paper, NumberInput
+  Box, Divider, ThemeIcon, Paper, NumberInput, SegmentedControl, Center
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
@@ -46,7 +46,16 @@ export default function ManageBookings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [opened, { open, close }] = useDisclosure(false);
+  const [filter, setFilter] = useState<'future' | 'past' | 'all'>('future');
   
+  const today = dayjs().startOf('day');
+
+  const filteredBookings = bookings.filter(b => {
+    const checkOut = dayjs(b.checkOut);
+    if (filter === 'future') return checkOut.isSame(today, 'day') || checkOut.isAfter(today);
+    if (filter === 'past') return checkOut.isBefore(today);
+    return true;
+  });
 
   const load = async () => {
     setLoading(true);
@@ -124,18 +133,38 @@ export default function ManageBookings() {
         </Button>
       </Group>
 
+      <Center mb="lg">
+        <SegmentedControl
+          value={filter}
+          onChange={(v: any) => setFilter(v)}
+          radius="xl"
+          size="sm"
+          color="blue"
+          data={[
+            { label: 'Prossime', value: 'future' },
+            { label: 'Passate', value: 'past' },
+            { label: 'Tutte', value: 'all' },
+          ]}
+        />
+      </Center>
 
       {loading ? (
         <Text c="dimmed" ta="center" py="xl">Caricamento...</Text>
-      ) : bookings.length === 0 ? (
+      ) : filteredBookings.length === 0 ? (
         <Paper withBorder p="xl" ta="center" radius="lg">
           <IconCalendarPlus size={32} color="var(--mantine-color-dimmed)" />
-          <Text c="dimmed" mt="sm">Nessuna prenotazione inserita.</Text>
-          <Button mt="md" size="sm" onClick={openAdd}>Aggiungi la prima prenotazione</Button>
+          <Text c="dimmed" mt="sm">
+            {filter === 'future' ? 'Nessuna prenotazione imminente.' : 
+             filter === 'past' ? 'Nessuna prenotazione passata.' : 
+             'Nessuna prenotazione inserita.'}
+          </Text>
+          {filter === 'all' && (
+            <Button mt="md" size="sm" onClick={openAdd}>Aggiungi la prima prenotazione</Button>
+          )}
         </Paper>
       ) : (
         <Stack gap="md">
-          {bookings.map(b => (
+          {filteredBookings.map(b => (
             <Card key={b.id} withBorder shadow="xs" radius="lg" padding="md">
               <Group justify="space-between" align="flex-start">
                 <Group gap="md" align="flex-start" style={{ flex: 1 }}>
