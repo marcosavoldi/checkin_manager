@@ -253,15 +253,19 @@ export default function Dashboard() {
             return (
               <Paper key={b.id} withBorder p="sm" radius="md">
                 <Group justify="space-between" mb="xs">
-                  <Badge color={SOURCE_COLORS[b.source]} variant="light" size="sm">
-                    {SOURCE_LABELS[b.source]}
-                  </Badge>
+                  {isAdmin ? (
+                    <Badge color={SOURCE_COLORS[b.source]} variant="light" size="sm">
+                      {SOURCE_LABELS[b.source]}
+                    </Badge>
+                  ) : (
+                    <Badge color="gray" variant="light" size="sm">Prenotazione</Badge>
+                  )}
                   <Group gap={4}>
                     {isCheckIn && <Badge color="green" variant="dot" size="sm">Check-in</Badge>}
                     {isCheckOut && <Badge color="red" variant="dot" size="sm">Check-out</Badge>}
                   </Group>
                 </Group>
-                {b.guestName && <Text size="sm" fw={500}>{b.guestName}</Text>}
+                {isAdmin && b.guestName && <Text size="sm" fw={500}>{b.guestName}</Text>}
                 <Text size="xs" c="dimmed" mt={4}>
                   {dayjs(b.checkIn).format('DD MMM')} → {dayjs(b.checkOut).format('DD MMM YYYY')}
                 </Text>
