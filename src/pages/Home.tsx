@@ -184,7 +184,6 @@ export default function Home() {
                   {nextCheckout ? (
                     <>
                       <Text fw={800} size="md" lh={1.2}>{dayjs(nextCheckout.checkOut).format('dddd D MMMM')}</Text>
-                      <Text size="xs" c="violet.8">Ospite: {nextCheckout.guestName || 'Riservato'}</Text>
                     </>
                   ) : (
                     <Text fw={700}>Nessun check-out imminente</Text>
@@ -194,32 +193,34 @@ export default function Home() {
             </Card>
           </Grid.Col>
 
-          {/* Settimanali Staff */}
-          <Grid.Col span={{ base: 6, xs: 6 }}>
+          {/* Settimanali Staff - Layout Verticale / Rettangolare */}
+          <Grid.Col span={12}>
             <Paper withBorder radius="md" p="sm" shadow="xs">
-              <Group wrap="nowrap" gap="xs">
-                <ThemeIcon size="md" radius="sm" variant="light" color="blue">
-                  <IconCalendarCheck size={16} />
+              <Group wrap="nowrap" gap="md">
+                <ThemeIcon size="lg" radius="md" variant="light" color="blue">
+                  <IconCalendarCheck size={20} />
                 </ThemeIcon>
-                <div>
-                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Questa sett.</Text>
-                  <Text fw={700} size="sm">{checkoutsThisWeek} Out</Text>
+                <div style={{ flex: 1 }}>
+                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Questa settimana</Text>
+                  <Text fw={700} size="sm">Check-out previsti: {checkoutsThisWeek}</Text>
                 </div>
               </Group>
             </Paper>
           </Grid.Col>
 
-          <Grid.Col span={{ base: 6, xs: 6 }}>
+          <Grid.Col span={12}>
             <Paper withBorder radius="md" p="sm" shadow="xs">
-              <Group wrap="nowrap" gap="xs">
-                <ThemeIcon size="md" radius="sm" variant="light" color="teal">
-                  <IconCalendarStats size={16} />
+              <Group wrap="nowrap" gap="md">
+                <ThemeIcon size="lg" radius="md" variant="light" color="teal">
+                  <IconCalendarStats size={20} />
                 </ThemeIcon>
-                <div>
-                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossima sett.</Text>
-                  <Text fw={700} size="sm">{bookings.filter(b => 
-                    dayjs(b.checkOut).isBetween(startOfThisWeek.add(1, 'week'), endOfThisWeek.add(1, 'week'), 'day', '[]')
-                  ).length} Out</Text>
+                <div style={{ flex: 1 }}>
+                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossima settimana</Text>
+                  <Text fw={700} size="sm">
+                    Check-out previsti: {bookings.filter(b => 
+                      dayjs(b.checkOut).isBetween(startOfThisWeek.add(1, 'week'), endOfThisWeek.add(1, 'week'), 'day', '[]')
+                    ).length}
+                  </Text>
                 </div>
               </Group>
             </Paper>

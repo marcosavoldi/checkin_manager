@@ -114,10 +114,13 @@ export default function Dashboard() {
   
   const today = dayjs().startOf('day');
   
+  // Per lo staff, mostriamo solo il futuro a prescindere dal filtro impostato
+  const activeFilter = isAdmin ? filter : 'future';
+
   const filteredBookings = bookings.filter(b => {
     const checkOut = dayjs(b.checkOut);
-    if (filter === 'future') return checkOut.isSame(today, 'day') || checkOut.isAfter(today);
-    if (filter === 'past') return checkOut.isBefore(today);
+    if (activeFilter === 'future') return checkOut.isSame(today, 'day') || checkOut.isAfter(today);
+    if (activeFilter === 'past') return checkOut.isBefore(today);
     return true;
   });
 
@@ -164,8 +167,8 @@ export default function Dashboard() {
         </Tabs.List>
       </Tabs>
 
-      {/* ── Filtro (solo vista cards) ───────────── */}
-      {view === 'cards' && (
+      {/* ── Filtro (solo vista cards e solo per Admin) ───────────── */}
+      {view === 'cards' && isAdmin && (
         <Center mb="lg">
           <SegmentedControl
             value={filter}
@@ -297,8 +300,11 @@ export default function Dashboard() {
               style={{ width: '100%' }}
               renderDay={(date) => {
                 const d = dayjs(date).toDate();
-                const isCheckIn = bookings.some(b => dayjs(d).isSame(dayjs(b.checkIn), 'day'));
-                const isCheckOut = bookings.some(b => dayjs(d).isSame(dayjs(b.checkOut), 'day'));
+                // Se lo staff, consideriamo solo prenotazioni future per i marker
+                const relevantBookings = isAdmin ? bookings : bookings.filter(b => dayjs(b.checkOut).isAfter(today.subtract(1, 'ms')));
+                
+                const isCheckIn = relevantBookings.some(b => dayjs(d).isSame(dayjs(b.checkIn), 'day'));
+                const isCheckOut = relevantBookings.some(b => dayjs(d).isSame(dayjs(b.checkOut), 'day'));
                 const isToday = dayjs(d).isSame(dayjs(), 'day');
                 return (
                   <Stack
