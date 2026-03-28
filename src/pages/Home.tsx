@@ -127,10 +127,20 @@ export default function Home() {
            <Grid gutter="md">
              {/* Occupazione Mese Corrente */}
              <Grid.Col span={{ base: 12, md: 6 }}>
-               <Card withBorder radius="lg" p="md" shadow="sm">
+                <Card 
+                  withBorder 
+                  radius="xl" 
+                  p="lg" 
+                  shadow="md"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                  }}
+                >
                  <Group justify="space-between" wrap="nowrap">
                    <div>
-                     <Text size="xs" fw={700} c="dimmed" tt="uppercase">Occupazione {currentMonth.label}</Text>
+                     <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Occupazione {currentMonth.label}</Text>
                      <Title order={4} mb={4}>{currentMonth.occupied} / {currentMonth.total} notti</Title>
                      <ProgressStack occupied={currentMonth.occupied} total={currentMonth.total} />
                    </div>
@@ -147,10 +157,20 @@ export default function Home() {
 
              {/* Occupazione Mese Prossimo */}
              <Grid.Col span={{ base: 12, md: 6 }}>
-               <Card withBorder radius="lg" p="md" shadow="sm">
+                <Card 
+                  withBorder 
+                  radius="xl" 
+                  p="lg" 
+                  shadow="md"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                  }}
+                >
                  <Group justify="space-between" wrap="nowrap">
                    <div>
-                     <Text size="xs" fw={700} c="dimmed" tt="uppercase">Occupazione {nextMonth.label}</Text>
+                     <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Occupazione {nextMonth.label}</Text>
                      <Title order={4} mb={4}>{nextMonth.occupied} / {nextMonth.total} notti</Title>
                      <ProgressStack occupied={nextMonth.occupied} total={nextMonth.total} color="blue" />
                    </div>
@@ -237,34 +257,54 @@ export default function Home() {
            <Grid gutter="md">
              {/* Prossimi Eventi Admin */}
              <Grid.Col span={{ base: 12, sm: 6 }}>
-               <Paper withBorder radius="md" p="sm" shadow="xs">
+                <Paper 
+                  withBorder 
+                  radius="xl" 
+                  p="md" 
+                  shadow="md"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                  }}
+                >
                  <Group wrap="nowrap">
-                   <ThemeIcon size="lg" radius="md" variant="light" color="green">
+                   <ThemeIcon size="lg" radius="xl" variant="light" color="green">
                      <IconLogin size={20} />
                    </ThemeIcon>
                    <div style={{ flex: 1 }}>
-                     <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossimo Check-in</Text>
-                     <Text size="sm" fw={700} truncate>
+                     <Text size="xs" c="dimmed" fw={800} tt="uppercase" lts="1px">Prossimo Check-in</Text>
+                     <Text size="sm" fw={800} truncate>
                        {nextCheckin ? dayjs(nextCheckin.checkIn).format('ddd D MMM') : 'Nessuno'}
                      </Text>
-                     <Text size="xs" c="dimmed">{checkinsThisWeek} previsti questa sett.</Text>
+                     <Text size="xs" c="dimmed" fw={500}>{checkinsThisWeek} previsti questa sett.</Text>
                    </div>
                  </Group>
                </Paper>
              </Grid.Col>
 
              <Grid.Col span={{ base: 12, sm: 6 }}>
-               <Paper withBorder radius="md" p="sm" shadow="xs">
+                <Paper 
+                  withBorder 
+                  radius="xl" 
+                  p="md" 
+                  shadow="md"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                  }}
+                >
                  <Group wrap="nowrap">
-                   <ThemeIcon size="lg" radius="md" variant="light" color="red">
+                   <ThemeIcon size="lg" radius="xl" variant="light" color="red">
                      <IconLogout size={20} />
                    </ThemeIcon>
                    <div style={{ flex: 1 }}>
-                     <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossimo Check-out</Text>
-                     <Text size="sm" fw={700} truncate>
+                     <Text size="xs" c="dimmed" fw={800} tt="uppercase" lts="1px">Prossimo Check-out</Text>
+                     <Text size="sm" fw={800} truncate>
                        {nextCheckout ? dayjs(nextCheckout.checkOut).format('ddd D MMM') : 'Nessuno'}
                      </Text>
-                     <Text size="xs" c="dimmed">{checkoutsThisWeek} previsti questa sett.</Text>
+                     <Text size="xs" c="dimmed" fw={500}>{checkoutsThisWeek} previsti questa sett.</Text>
                    </div>
                  </Group>
                </Paper>
