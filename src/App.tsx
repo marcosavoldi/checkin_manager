@@ -29,8 +29,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   if (!user || loading) return <>{children}</>;
 
   const navItems = [
-    { label: 'Home', icon: <IconHome size={16} />, path: '/home' },
-    { label: 'Prenotazioni', icon: <IconLayoutDashboard size={16} />, path: '/' },
+    { label: 'Home', icon: <IconHome size={16} />, path: '/' },
+    { label: 'Prenotazioni', icon: <IconLayoutDashboard size={16} />, path: '/prenotazioni' },
     ...(user.appRole === 'admin'
       ? [{ label: 'Gestione Prenotazioni', icon: <IconCalendarPlus size={16} />, path: '/gestione' }]
       : [])
@@ -58,10 +58,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           <Group gap={10}>
             <Tooltip label="Home">
               <ActionIcon
-                variant={location.pathname === '/home' ? 'light' : 'subtle'}
+                variant={location.pathname === '/' ? 'light' : 'subtle'}
                 color="violet"
                 size="lg"
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/')}
                 radius="md"
               >
                 <IconHome size={20} />
@@ -115,10 +115,10 @@ export default function App() {
           <Route path="/*" element={
             <MainLayout>
               <Routes>
-                <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/prenotazioni" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/gestione" element={<ProtectedRoute adminOnly><ManageBookings /></ProtectedRoute>} />
-                <Route path="*" element={<Navigate to="/home" />} />
+                <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </MainLayout>
           } />
