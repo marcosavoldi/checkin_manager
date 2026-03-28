@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Title, Text, Button, Grid, Card, Badge, Group, Stack,
-  Tabs, Modal, Box, ThemeIcon, Avatar, Paper, Collapse, Divider
+  Tabs, Modal, Box, ThemeIcon, Avatar, Paper, Collapse, Divider, SegmentedControl, Center
 } from '@mantine/core';
 import { Calendar } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
@@ -90,6 +90,7 @@ export default function Dashboard() {
   const [selectedBooking, setSelectedBooking] = useState<BookingEventCompat | null>(null);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [dayModalOpened, { open: openDayModal, close: closeDayModal }] = useDisclosure(false);
+  const [filter, setFilter] = useState<'future' | 'past' | 'all'>('future');
 
   const loadData = async () => {
     setLoading(true);
@@ -110,6 +111,16 @@ export default function Dashboard() {
   if (error) return <ErrorState message={error} onRetry={loadData} />;
 
   const isAdmin = user?.appRole === 'admin';
+  
+  const today = dayjs().startOf('day');
+  
+  const filteredBookings = bookings.filter(b => {
+    const checkOut = dayjs(b.checkOut);
+    if (filter === 'future') return checkOut.isSame(today, 'day') || checkOut.isAfter(today);
+    if (filter === 'past') return checkOut.isBefore(today);
+    return true;
+  });
+
   const dayBookings = selectedDay ? getBookingsForDay(bookings, selectedDay) : [];
 
   const handleDayClick = (date: Date) => {
@@ -153,16 +164,45 @@ export default function Dashboard() {
         </Tabs.List>
       </Tabs>
 
+      {/* ── Filtro (solo vista cards) ───────────── */}
+      {view === 'cards' && (
+        <Center mb="lg">
+          <SegmentedControl
+            value={filter}
+            onChange={(v: any) => setFilter(v)}
+            radius="xl"
+            size="sm"
+            transitionDuration={200}
+            color="violet"
+            data={[
+              { label: 'Prossime', value: 'future' },
+              { label: 'Passate', value: 'past' },
+              { label: 'Tutte', value: 'all' },
+            ]}
+            style={{ 
+              backgroundColor: 'var(--mantine-color-gray-0)',
+              border: '1px solid var(--mantine-color-gray-2)'
+            }}
+          />
+        </Center>
+      )}
+
       {/* ── VISTA CARD ─────────────────────────── */}
       {view === 'cards' && (
-        bookings.length === 0 ? (
+        filteredBookings.length === 0 ? (
           <Paper withBorder p="xl" radius="md" ta="center">
-            <Text c="dimmed" fs="italic">Nessuna prenotazione imminente.</Text>
-            <Text size="xs" c="dimmed" mt={4}>L'Admin può aggiungerne dalla sezione "Gestione Prenotazioni".</Text>
+            <Text c="dimmed" fs="italic">
+              {filter === 'future' ? 'Nessuna prenotazione imminente.' : 
+               filter === 'past' ? 'Nessuna prenotazione passata.' : 
+               'Nessuna prenotazione trovata.'}
+            </Text>
+            {isAdmin && filter === 'future' && (
+              <Text size="xs" c="dimmed" mt={4}>L'Admin può aggiungerne dalla sezione "Gestione Prenotazioni".</Text>
+            )}
           </Paper>
         ) : (
           <Grid gutter="md">
-            {bookings.map((b) => (
+            {filteredBookings.map((b) => (
               <Grid.Col span={{ base: 12, sm: 6, lg: 4 }} key={b.id}>
                 <Card shadow="sm" padding="md" radius="xl" withBorder h="100%" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
