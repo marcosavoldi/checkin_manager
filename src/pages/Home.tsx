@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button } from '@mantine/core';
+import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, useMantineColorScheme, useComputedColorScheme } from '@mantine/core';
 import { IconCalendarCheck, IconCalendarStats, IconDoorExit, IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
@@ -14,6 +14,12 @@ dayjs.extend(weekday);
 dayjs.locale('it');
 
 export default function Home() {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const glassStyles = {
+    background: computedColorScheme === 'dark' ? 'rgba(36, 36, 36, 0.4)' : 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'blur(10px)',
+    border: computedColorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)',
+  };
   const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,11 +138,7 @@ export default function Home() {
                   radius="xl" 
                   p="lg" 
                   shadow="md"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                  }}
+                  style={glassStyles}
                 >
                  <Group justify="space-between" wrap="nowrap">
                    <div>
@@ -162,11 +164,7 @@ export default function Home() {
                   radius="xl" 
                   p="lg" 
                   shadow="md"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                  }}
+                  style={glassStyles}
                 >
                  <Group justify="space-between" wrap="nowrap">
                    <div>
@@ -194,11 +192,7 @@ export default function Home() {
                 radius="xl" 
                 p="lg" 
                 shadow="md"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.7)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                }}
+                style={glassStyles}
               >
                 <Group justify="space-between" mb="md">
                   <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Inventario Biancheria Pulita</Text>
@@ -262,11 +256,7 @@ export default function Home() {
                   radius="xl" 
                   p="md" 
                   shadow="md"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                  }}
+                  style={glassStyles}
                 >
                  <Group wrap="nowrap">
                    <ThemeIcon size="lg" radius="xl" variant="light" color="green">
@@ -289,11 +279,7 @@ export default function Home() {
                   radius="xl" 
                   p="md" 
                   shadow="md"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                  }}
+                  style={glassStyles}
                 >
                  <Group wrap="nowrap">
                    <ThemeIcon size="lg" radius="xl" variant="light" color="red">

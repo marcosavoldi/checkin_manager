@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
 import {
-  Title, Button, Group, Stack, Text, Divider, ThemeIcon, Paper, NumberInput, SimpleGrid, Container, Badge, Box
+  Title, Button, Group, Stack, Text, Divider, ThemeIcon, Paper, NumberInput, SimpleGrid, Container, Badge, Box, useComputedColorScheme
 } from '@mantine/core';
 import { IconBed, IconBath, IconPlus, IconRefresh, IconAlertCircle } from '@tabler/icons-react';
 import { getLinenInventory, addCleanLinen, setLinenInventory, type LinenInventory } from '../services/inventoryService';
 import dayjs from 'dayjs';
 
 export default function LinenManagement() {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const glassStyles = {
+    background: computedColorScheme === 'dark' ? 'rgba(36, 36, 36, 0.4)' : 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'blur(10px)',
+    border: computedColorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)',
+  };
   const [inventory, setInventory] = useState<LinenInventory | null>(null);
   const [loading, setLoading] = useState(true);
   const [invLoading, setInvLoading] = useState(false);
@@ -81,7 +87,7 @@ export default function LinenManagement() {
                 p="xl" 
                 radius="24px" 
                 shadow="sm"
-                style={{ borderLeft: inventory.bedKits < 0 ? '6px solid var(--mantine-color-red-6)' : '6px solid var(--mantine-color-indigo-6)' }}
+                style={{ ...glassStyles, borderLeft: inventory.bedKits < 0 ? "6px solid var(--mantine-color-red-6)" : "6px solid var(--mantine-color-indigo-6)" }}
               >
                 <Stack align="center" gap="xs">
                   <ThemeIcon size={64} radius="xl" color="indigo" variant="light">
@@ -102,7 +108,7 @@ export default function LinenManagement() {
                 p="xl" 
                 radius="24px" 
                 shadow="sm"
-                style={{ borderLeft: inventory.towelKits < 0 ? '6px solid var(--mantine-color-red-6)' : '6px solid var(--mantine-color-teal-6)' }}
+                style={{ ...glassStyles, borderLeft: inventory.towelKits < 0 ? "6px solid var(--mantine-color-red-6)" : "6px solid var(--mantine-color-teal-6)" }}
               >
                 <Stack align="center" gap="xs">
                   <ThemeIcon size={64} radius="xl" color="teal" variant="light">
@@ -120,7 +126,7 @@ export default function LinenManagement() {
             </SimpleGrid>
 
             {(inventory.bedKits === 0 && inventory.towelKits === 0) && (
-              <Paper p="md" radius="lg" bg="orange.0" style={{ border: '1px solid var(--mantine-color-orange-2)' }}>
+              <Paper p="md" radius="lg" bg="orange.0" style={{ ...glassStyles, border: "1px solid var(--mantine-color-orange-2)" }}>
                 <Group wrap="nowrap" gap="sm">
                   <IconAlertCircle color="var(--mantine-color-orange-6)" />
                   <Text size="sm" c="orange.9" fw={500}>
