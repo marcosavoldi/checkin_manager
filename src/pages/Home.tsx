@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, Box, useComputedColorScheme } from '@mantine/core';
 import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
 import { getLinenInventory, subtractLinen, type LinenInventory } from '../services/inventoryService';
@@ -21,6 +22,7 @@ export default function Home() {
     border: computedColorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)',
   };
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [inventory, setInventory] = useState<LinenInventory | null>(null);
@@ -209,7 +211,7 @@ export default function Home() {
                       size="xs" 
                       radius="xl"
                       rightSection={<IconArrowRight size={14} />}
-                      onClick={() => window.location.href = '/biancheria'}
+                      onClick={() => navigate('/biancheria')}
                     >
                       Configura ora
                     </Button>
@@ -435,8 +437,7 @@ export default function Home() {
               </SimpleGrid>
 
               <Button 
-                component="a"
-                href="/staff"
+                onClick={() => navigate('/prenotazioni')}
                 fullWidth 
                 size="sm" 
                 radius="md" 
