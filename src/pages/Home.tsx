@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, useComputedColorScheme } from '@mantine/core';
-import { IconCalendarCheck, IconCalendarStats, IconDoorExit, IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight } from '@tabler/icons-react';
+import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
 import { getLinenInventory, subtractLinen, type LinenInventory } from '../services/inventoryService';
@@ -298,61 +298,98 @@ export default function Home() {
            </Grid>
         </Stack>
       ) : (
-        <Grid gutter="md">
-          {/* Prossimo Checkout Staff */}
-          <Grid.Col span={12}>
-            <Card withBorder radius="lg" p="md" shadow="sm" style={{ background: 'var(--mantine-color-violet-light)' }}>
-              <Group gap="md" wrap="nowrap">
-                <ThemeIcon size={44} radius="md" color="violet" variant="filled">
-                  <IconDoorExit size={24} />
-                </ThemeIcon>
-                <div>
-                  <Text size="xs" fw={700} tt="uppercase" c="violet.9">Prossimo Check-out</Text>
-                  {nextCheckout ? (
-                    <>
-                      <Text fw={800} size="md" lh={1.2}>{dayjs(nextCheckout.checkOut).format('dddd D MMMM')}</Text>
-                    </>
-                  ) : (
-                    <Text fw={700}>Nessun check-out imminente</Text>
-                  )}
-                </div>
-              </Group>
-            </Card>
-          </Grid.Col>
+        <Stack gap="md">
+          {/* Nuovo Widget Unificato 7 Giorni Staff */}
+          <Card 
+            withBorder 
+            radius="xl" 
+            p="xl" 
+            shadow="xl"
+            style={{
+              ...glassStyles,
+              background: computedColorScheme === 'dark' 
+                ? 'linear-gradient(135deg, rgba(103, 58, 183, 0.2) 0%, rgba(36, 36, 36, 0.4) 100%)' 
+                : 'linear-gradient(135deg, rgba(103, 58, 183, 0.05) 0%, rgba(255, 255, 255, 0.7) 100%)',
+              overflow: 'hidden',
+              position: 'relative'
+            }}
+          >
+            {/* Background decoration */}
+            <div style={{
+              position: 'absolute',
+              top: -20,
+              right: -20,
+              width: 120,
+              height: 120,
+              borderRadius: '50%',
+              background: 'var(--mantine-color-violet-light)',
+              filter: 'blur(40px)',
+              opacity: 0.5,
+              zIndex: 0
+            }} />
 
-          {/* Settimanali Staff - Layout Verticale / Rettangolare */}
-          <Grid.Col span={12}>
-            <Paper withBorder radius="md" p="sm" shadow="xs">
-              <Group wrap="nowrap" gap="md">
-                <ThemeIcon size="lg" radius="md" variant="light" color="blue">
-                  <IconCalendarCheck size={20} />
-                </ThemeIcon>
-                <div style={{ flex: 1 }}>
-                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Questa settimana</Text>
-                  <Text fw={700} size="sm">Check-out previsti: {checkoutsThisWeek}</Text>
-                </div>
+            <Stack gap="xl" style={{ position: 'relative', zIndex: 1 }}>
+              <Group justify="space-between" align="flex-start">
+                <Stack gap={0}>
+                  <Text size="xs" fw={800} tt="uppercase" c="violet.7" lts="1.5px">Prossimi 7 giorni</Text>
+                  <Title order={3} fw={900}>Panoramica Attività</Title>
+                </Stack>
+                <Badge variant="light" color="violet" size="lg" radius="md" p="md">
+                  {today.format('DD MMM')} - {today.add(7, 'day').format('DD MMM')}
+                </Badge>
               </Group>
-            </Paper>
-          </Grid.Col>
 
-          <Grid.Col span={12}>
-            <Paper withBorder radius="md" p="sm" shadow="xs">
-              <Group wrap="nowrap" gap="md">
-                <ThemeIcon size="lg" radius="md" variant="light" color="teal">
-                  <IconCalendarStats size={20} />
-                </ThemeIcon>
-                <div style={{ flex: 1 }}>
-                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">Prossima settimana</Text>
-                  <Text fw={700} size="sm">
-                    Check-out previsti: {bookings.filter(b => 
-                      dayjs(b.checkOut).isBetween(startOfThisWeek.add(1, 'week'), endOfThisWeek.add(1, 'week'), 'day', '[]')
-                    ).length}
-                  </Text>
-                </div>
-              </Group>
-            </Paper>
-          </Grid.Col>
-        </Grid>
+              <SimpleGrid cols={2} spacing="md">
+                <Paper withBorder radius="xl" p="md" style={{ background: 'transparent' }}>
+                  <Group wrap="nowrap" gap="sm">
+                    <ThemeIcon size={42} radius="md" color="green" variant="light">
+                      <IconLogin size={22} />
+                    </ThemeIcon>
+                    <div>
+                      <Text size="xs" c="dimmed" fw={700} tt="uppercase">Check-in</Text>
+                      <Text fw={900} size="xl" lh={1}>
+                        {bookings.filter(b => dayjs(b.checkIn).isBetween(today, today.add(7, 'day'), 'day', '[]')).length}
+                      </Text>
+                    </div>
+                  </Group>
+                </Paper>
+
+                <Paper withBorder radius="xl" p="md" style={{ background: 'transparent' }}>
+                  <Group wrap="nowrap" gap="sm">
+                    <ThemeIcon size={42} radius="md" color="red" variant="light">
+                      <IconLogout size={22} />
+                    </ThemeIcon>
+                    <div>
+                      <Text size="xs" c="dimmed" fw={700} tt="uppercase">Check-out</Text>
+                      <Text fw={900} size="xl" lh={1}>
+                        {bookings.filter(b => dayjs(b.checkOut).isBetween(today, today.add(7, 'day'), 'day', '[]')).length}
+                      </Text>
+                    </div>
+                  </Group>
+                </Paper>
+              </SimpleGrid>
+
+              <Button 
+                component="a"
+                href="/staff"
+                fullWidth 
+                size="md" 
+                radius="xl" 
+                color="violet"
+                variant="filled"
+                rightSection={<IconArrowRight size={18} />}
+                style={{
+                  boxShadow: '0 8px 20px rgba(103, 58, 183, 0.3)',
+                  transition: 'transform 0.2s ease',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                Vedi Tutte le Prenotazioni
+              </Button>
+            </Stack>
+          </Card>
+        </Stack>
       )}
     </Stack>
   );
