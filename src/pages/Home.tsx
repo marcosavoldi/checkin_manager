@@ -299,69 +299,81 @@ export default function Home() {
         </Stack>
       ) : (
         <Stack gap="md">
-          {/* Nuovo Widget Unificato 7 Giorni Staff */}
+          {/* 1. Prossimo Check-out (Priorità massima) */}
           <Card 
             withBorder 
             radius="xl" 
-            p="xl" 
+            p="md" 
+            shadow="md" 
+            style={{ 
+              background: 'linear-gradient(135deg, var(--mantine-color-violet-6) 0%, var(--mantine-color-violet-8) 100%)',
+              color: 'white',
+              border: 'none'
+            }}
+          >
+            <Group gap="md" wrap="nowrap">
+              <ThemeIcon size={44} radius="lg" color="rgba(255,255,255,0.2)" variant="filled">
+                <IconLogout size={24} color="white" />
+              </ThemeIcon>
+              <div>
+                <Text size="xs" fw={700} tt="uppercase" style={{ color: 'rgba(255,255,255,0.7)', lts: '1px' }}>Prossimo Check-out</Text>
+                {nextCheckout ? (
+                  <Text fw={900} size="lg" lh={1.2}>
+                    {dayjs(nextCheckout.checkOut).format('dddd D MMMM')}
+                  </Text>
+                ) : (
+                  <Text fw={700}>Nessuna uscita prevista</Text>
+                )}
+              </div>
+            </Group>
+          </Card>
+
+          {/* 2. Panoramica 7 Giorni (Layout Riparato) */}
+          <Card 
+            withBorder 
+            radius="xl" 
+            p="lg" 
             shadow="xl"
             style={{
               ...glassStyles,
               background: computedColorScheme === 'dark' 
-                ? 'linear-gradient(135deg, rgba(103, 58, 183, 0.2) 0%, rgba(36, 36, 36, 0.4) 100%)' 
-                : 'linear-gradient(135deg, rgba(103, 58, 183, 0.05) 0%, rgba(255, 255, 255, 0.7) 100%)',
-              overflow: 'hidden',
-              position: 'relative'
+                ? 'rgba(36, 36, 36, 0.6)' 
+                : 'rgba(255, 255, 255, 0.8)',
+              overflow: 'hidden'
             }}
           >
-            {/* Background decoration */}
-            <div style={{
-              position: 'absolute',
-              top: -20,
-              right: -20,
-              width: 120,
-              height: 120,
-              borderRadius: '50%',
-              background: 'var(--mantine-color-violet-light)',
-              filter: 'blur(40px)',
-              opacity: 0.5,
-              zIndex: 0
-            }} />
+            <Stack gap="md">
+              <Stack gap={2}>
+                <Text size="xs" fw={800} tt="uppercase" c="violet.7" lts="1px">I Prossimi 7 giorni</Text>
+                <Title order={4} fw={900}>Panoramica Attività</Title>
+                <Text size="xs" c="dimmed" fw={600}>
+                  {today.format('D MMM')} — {today.add(7, 'day').format('D MMM')}
+                </Text>
+              </Stack>
 
-            <Stack gap="xl" style={{ position: 'relative', zIndex: 1 }}>
-              <Group justify="space-between" align="flex-start">
-                <Stack gap={0}>
-                  <Text size="xs" fw={800} tt="uppercase" c="violet.7" lts="1.5px">Prossimi 7 giorni</Text>
-                  <Title order={3} fw={900}>Panoramica Attività</Title>
-                </Stack>
-                <Badge variant="light" color="violet" size="lg" radius="md" p="md">
-                  {today.format('DD MMM')} - {today.add(7, 'day').format('DD MMM')}
-                </Badge>
-              </Group>
-
-              <SimpleGrid cols={2} spacing="md">
-                <Paper withBorder radius="xl" p="md" style={{ background: 'transparent' }}>
+              <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm">
+                <Paper withBorder radius="lg" p="sm" style={{ background: 'var(--mantine-color-green-light)', borderColor: 'var(--mantine-color-green-2)' }}>
                   <Group wrap="nowrap" gap="sm">
-                    <ThemeIcon size={42} radius="md" color="green" variant="light">
-                      <IconLogin size={22} />
+                    <ThemeIcon size={34} radius="md" color="green" variant="filled">
+                      <IconLogin size={18} />
                     </ThemeIcon>
                     <div>
-                      <Text size="xs" c="dimmed" fw={700} tt="uppercase">Check-in</Text>
-                      <Text fw={900} size="xl" lh={1}>
+                      <Text size="xs" c="green.9" fw={700} tt="uppercase">Check-in</Text>
+                      <Text fw={900} size="lg" lh={1} c="green.9">
                         {bookings.filter(b => dayjs(b.checkIn).isBetween(today, today.add(7, 'day'), 'day', '[]')).length}
                       </Text>
                     </div>
                   </Group>
                 </Paper>
 
-                <Paper withBorder radius="xl" p="md" style={{ background: 'transparent' }}>
+                <Paper withBorder radius="lg" p="sm" style={{ background: 'var(--mantine-color-red-light)', borderColor: 'var(--mantine-color-red-2)' }}>
                   <Group wrap="nowrap" gap="sm">
-                    <ThemeIcon size={42} radius="md" color="red" variant="light">
-                      <IconLogout size={22} />
+                    <ThemeIcon size={34} radius="md" color="red" variant="filled">
+                      <IconLogout size={18} />
                     </ThemeIcon>
                     <div>
-                      <Text size="xs" c="dimmed" fw={700} tt="uppercase">Check-out</Text>
-                      <Text fw={900} size="xl" lh={1}>
+                      <Text size="xs" c="red.9" fw={700} tt="uppercase">Check-out</Text>
+                      <Text fw={900} size="lg" lh={1} c="red.9">
                         {bookings.filter(b => dayjs(b.checkOut).isBetween(today, today.add(7, 'day'), 'day', '[]')).length}
                       </Text>
                     </div>
@@ -373,19 +385,14 @@ export default function Home() {
                 component="a"
                 href="/staff"
                 fullWidth 
-                size="md" 
-                radius="xl" 
+                size="sm" 
+                radius="md" 
                 color="violet"
-                variant="filled"
-                rightSection={<IconArrowRight size={18} />}
-                style={{
-                  boxShadow: '0 8px 20px rgba(103, 58, 183, 0.3)',
-                  transition: 'transform 0.2s ease',
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                variant="light"
+                rightSection={<IconArrowRight size={16} />}
+                mt="xs"
               >
-                Vedi Tutte le Prenotazioni
+                Vedi Dettagli Prenotazioni
               </Button>
             </Stack>
           </Card>
