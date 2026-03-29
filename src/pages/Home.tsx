@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, useComputedColorScheme } from '@mantine/core';
+import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, Box, useComputedColorScheme } from '@mantine/core';
 import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
@@ -306,26 +306,79 @@ export default function Home() {
             p="md" 
             shadow="md" 
             style={{ 
-              background: 'linear-gradient(135deg, var(--mantine-color-violet-6) 0%, var(--mantine-color-violet-8) 100%)',
+              background: 'linear-gradient(135deg, var(--mantine-color-red-6) 0%, var(--mantine-color-red-8) 100%)',
               color: 'white',
               border: 'none'
             }}
           >
-            <Group gap="md" wrap="nowrap">
-              <ThemeIcon size={44} radius="lg" color="rgba(255,255,255,0.2)" variant="filled">
-                <IconLogout size={24} color="white" />
-              </ThemeIcon>
-              <div>
-                <Text size="xs" fw={700} tt="uppercase" style={{ color: 'rgba(255,255,255,0.7)', lts: '1px' }}>Prossimo Check-out</Text>
-                {nextCheckout ? (
-                  <Text fw={900} size="lg" lh={1.2}>
-                    {dayjs(nextCheckout.checkOut).format('dddd D MMMM')}
-                  </Text>
-                ) : (
-                  <Text fw={700}>Nessuna uscita prevista</Text>
-                )}
-              </div>
-            </Group>
+            <Stack gap="xs">
+              <Group gap="md" wrap="nowrap">
+                <ThemeIcon size={44} radius="lg" color="rgba(255,255,255,0.2)" variant="filled">
+                  <IconLogout size={24} color="white" />
+                </ThemeIcon>
+                <div>
+                  <Text size="xs" fw={700} tt="uppercase" style={{ color: 'rgba(255,255,255,0.7)', lts: '1px' }}>Prossimo Check-out</Text>
+                  {nextCheckout ? (
+                    <Text fw={900} size="lg" lh={1.2}>
+                      {dayjs(nextCheckout.checkOut).format('dddd D MMMM')}
+                    </Text>
+                  ) : (
+                    <Text fw={700}>Nessuna uscita prevista</Text>
+                  )}
+                </div>
+              </Group>
+              
+              {nextCheckout?.staffNote && (
+                <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
+                  <Group gap={5} mb={2}>
+                    <IconAlertCircle size={14} color="white" />
+                    <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota</Text>
+                  </Group>
+                  <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckout.staffNote}</Text>
+                </Box>
+              )}
+            </Stack>
+          </Card>
+
+          {/* 1b. Prossimo Check-in */}
+          <Card 
+            withBorder 
+            radius="xl" 
+            p="md" 
+            shadow="md" 
+            style={{ 
+              background: 'linear-gradient(135deg, var(--mantine-color-green-6) 0%, var(--mantine-color-green-8) 100%)',
+              color: 'white',
+              border: 'none'
+            }}
+          >
+            <Stack gap="xs">
+              <Group gap="md" wrap="nowrap">
+                <ThemeIcon size={44} radius="lg" color="rgba(255,255,255,0.2)" variant="filled">
+                  <IconLogin size={24} color="white" />
+                </ThemeIcon>
+                <div>
+                  <Text size="xs" fw={700} tt="uppercase" style={{ color: 'rgba(255,255,255,0.7)', lts: '1px' }}>Prossimo Check-in</Text>
+                  {nextCheckin ? (
+                    <Text fw={900} size="lg" lh={1.2}>
+                      {dayjs(nextCheckin.checkIn).format('dddd D MMMM')}
+                    </Text>
+                  ) : (
+                    <Text fw={700}>Nessun arrivo previsto</Text>
+                  )}
+                </div>
+              </Group>
+
+              {nextCheckin?.staffNote && (
+                <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
+                  <Group gap={5} mb={2}>
+                    <IconAlertCircle size={14} color="white" />
+                    <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota</Text>
+                  </Group>
+                  <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckin.staffNote}</Text>
+                </Box>
+              )}
+            </Stack>
           </Card>
 
           {/* 2. Panoramica 7 Giorni (Layout Riparato) */}
