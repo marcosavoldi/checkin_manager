@@ -41,7 +41,7 @@ function getBookingsForDay(bookings: Booking[], date: Date) {
 
 const NOTE_THRESHOLD = 120;
 
-function StaffNote({ note }: { note: string }) {
+function StaffNote({ note, isAdmin }: { note: string; isAdmin?: boolean }) {
   const [expanded, setExpanded] = useState(false);
   if (!note) return null;
   const isLong = note.length > NOTE_THRESHOLD;
@@ -63,7 +63,7 @@ function StaffNote({ note }: { note: string }) {
           <IconNotes size={12} stroke={2.5} />
         </ThemeIcon>
         <Text size="xs" fw={900} c="orange.8" tt="uppercase" style={{ letterSpacing: 1 }}>
-          Nota Staff Importante
+          {isAdmin ? 'Nota Staff Importante' : 'Note'}
         </Text>
       </Group>
       {isLong ? (
@@ -281,7 +281,7 @@ export default function Dashboard() {
                   </Group>
 
                   {/* Row 4: Staff note */}
-                  {b.staffNote && <StaffNote note={b.staffNote} />}
+                  {b.staffNote && <StaffNote note={b.staffNote} isAdmin={isAdmin} />}
 
                   {/* Row 5: CTA button (Admin ONLY) */}
                   {isAdmin && (
@@ -422,7 +422,7 @@ export default function Dashboard() {
                 </Group>
 
                 {/* Staff note */}
-                {b.staffNote && <StaffNote note={b.staffNote} />}
+                {b.staffNote && <StaffNote note={b.staffNote} isAdmin={isAdmin} />}
 
                 <Button
                   fullWidth mt="sm" size="xs" variant="light" color="violet" radius="md"
