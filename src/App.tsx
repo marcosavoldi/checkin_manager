@@ -1,7 +1,7 @@
 import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconBed, IconUsers } from '@tabler/icons-react';
+import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconBed, IconUsers, IconLogout } from '@tabler/icons-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -22,7 +22,7 @@ function ProtectedRoute({ children, adminOnly }: { children: React.ReactNode, ad
 
 function MainLayout({ children }: { children: React.ReactNode }) {
   const [opened, { toggle, close }] = useDisclosure();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { setColorScheme } = useMantineColorScheme();
@@ -99,16 +99,29 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       </AppShell.Header>
 
       <AppShell.Navbar p="xs">
-        {navItems.map(item => (
+        <AppShell.Section grow>
+          {navItems.map(item => (
+            <NavLink
+              key={item.path}
+              label={item.label}
+              leftSection={item.icon}
+              active={location.pathname === item.path}
+              onClick={() => { navigate(item.path); close(); }}
+              style={{ borderRadius: 8, marginBottom: 4 }}
+            />
+          ))}
+        </AppShell.Section>
+
+        <AppShell.Section>
           <NavLink
-            key={item.path}
-            label={item.label}
-            leftSection={item.icon}
-            active={location.pathname === item.path}
-            onClick={() => { navigate(item.path); close(); }}
-            style={{ borderRadius: 8, marginBottom: 4 }}
+            label="Esci"
+            leftSection={<IconLogout size={16} />}
+            onClick={() => { logout(); close(); }}
+            color="red"
+            variant="subtle"
+            style={{ borderRadius: 8, marginTop: 4 }}
           />
-        ))}
+        </AppShell.Section>
       </AppShell.Navbar>
 
       <AppShell.Main>
