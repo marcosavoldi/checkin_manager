@@ -180,7 +180,7 @@ export default function ManageBookings() {
       ) : (
         <Stack gap="md">
           {filteredBookings.map(b => {
-            const nights = dayjs(b.checkOut).diff(dayjs(b.checkIn), 'day');
+            const nights = dayjs(b.checkOut).startOf('day').diff(dayjs(b.checkIn).startOf('day'), 'day');
             return (
               <Card key={b.id} withBorder shadow="sm" radius="lg" padding="md">
                 <Stack gap="sm">
