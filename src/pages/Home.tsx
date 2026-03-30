@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, Box, useComputedColorScheme } from '@mantine/core';
-import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight } from '@tabler/icons-react';
+import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, Box, useComputedColorScheme, Accordion } from '@mantine/core';
+import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight, IconLayoutGrid } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
@@ -105,6 +105,13 @@ export default function Home() {
   const nextMonth = getOccupancy(1);
 
   // --- LOGICA PROSSIMI EVENTI (Admin & Staff) ---
+  const tomorrow = dayjs().add(1, 'day').startOf('day');
+  const upcomingActivityCount = bookings.filter(b => 
+    (dayjs(b.checkIn).isSame(tomorrow, 'day') || dayjs(b.checkIn).isAfter(tomorrow, 'day')) &&
+    (dayjs(b.checkIn).isBefore(tomorrow.add(7, 'day'), 'day') || 
+     dayjs(b.checkOut).isAfter(tomorrow, 'day') && dayjs(b.checkOut).isBefore(tomorrow.add(7, 'day'), 'day'))
+  ).length;
+
   const nextCheckout = bookings
     .filter(b => dayjs(b.checkOut).isAfter(today) || dayjs(b.checkOut).isSame(today))
     .sort((a, b) => dayjs(a.checkOut).diff(dayjs(b.checkOut)))[0];
@@ -300,54 +307,58 @@ export default function Home() {
            </Grid>
         </Stack>
       ) : (
-        <Stack gap="md">
-          {/* 1. Prossimo Check-out (Priorità massima) */}
+        <Stack gap="lg">
+          {/* 1. Prossimo Check-out */}
           <Card 
             withBorder 
-            radius="xl" 
-            p="md" 
-            shadow="md" 
+            radius="24px" 
+            p="xl" 
+            shadow="xl" 
             style={{ 
-              background: 'linear-gradient(135deg, var(--mantine-color-red-6) 0%, var(--mantine-color-red-8) 100%)',
-              color: 'white',
-              border: 'none'
+              ...glassStyles,
+              background: computedColorScheme === 'dark' 
+                ? 'linear-gradient(135deg, rgba(234, 56, 56, 0.1) 0%, rgba(36, 36, 36, 0.6) 100%)' 
+                : 'linear-gradient(135deg, rgba(250, 82, 82, 0.05) 0%, rgba(255, 255, 255, 0.9) 100%)',
+              borderColor: 'var(--mantine-color-red-light)',
+              overflow: 'hidden',
+              position: 'relative'
             }}
           >
-            <Stack gap="xs">
-              <Group gap="md" wrap="nowrap">
-                <ThemeIcon size={44} radius="lg" color="rgba(255,255,255,0.2)" variant="filled">
-                  <IconLogout size={24} color="white" />
-                </ThemeIcon>
-                <div>
-                  <Text size="xs" fw={700} tt="uppercase" style={{ color: 'rgba(255,255,255,0.7)', lts: '1px' }}>Prossimo Check-out</Text>
+            <Stack gap="md">
+              <Group justify="space-between" wrap="nowrap" align="flex-start">
+                <Stack gap={4}>
+                  <Text size="xs" fw={800} tt="uppercase" c="red.6" lts="1.5px">Prossimo Check-out</Text>
                   {nextCheckout ? (
-                    <Text fw={900} size="lg" lh={1.2}>
+                    <Title order={3} fw={900}>
                       {dayjs(nextCheckout.checkOut).format('dddd D MMMM')}
-                    </Text>
+                    </Title>
                   ) : (
                     <Text fw={700}>Nessuna uscita prevista</Text>
                   )}
-                </div>
+                </Stack>
+                <ThemeIcon size={52} radius="xl" color="red.6" variant="light" style={{ background: 'var(--mantine-color-red-light)' }}>
+                  <IconLogout size={28} />
+                </ThemeIcon>
               </Group>
               
               {nextCheckout && (nextCheckout.staffNoteCheckOut || nextCheckout.staffNoteBooking) && (
-                <Stack gap={6}>
+                <Stack gap={8} mt="xs">
                   {nextCheckout.staffNoteCheckOut && (
-                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
-                      <Group gap={5} mb={2}>
-                        <IconAlertCircle size={14} color="white" />
-                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Check-out</Text>
+                    <Box p="sm" style={{ background: 'var(--mantine-color-red-light)', borderRadius: 16, border: '1px solid var(--mantine-color-red-1)' }}>
+                      <Group gap={6} mb={4}>
+                        <IconAlertCircle size={14} color="var(--mantine-color-red-7)" />
+                        <Text size="xs" fw={900} tt="uppercase" c="red.8">Nota Check-out</Text>
                       </Group>
-                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckout.staffNoteCheckOut}</Text>
+                      <Text size="sm" fw={700} c="red.9">{nextCheckout.staffNoteCheckOut}</Text>
                     </Box>
                   )}
                   {nextCheckout.staffNoteBooking && (
-                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
-                      <Group gap={5} mb={2}>
-                        <IconAlertCircle size={14} color="white" />
-                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Prenotazione</Text>
+                    <Box p="sm" style={{ background: 'var(--mantine-color-gray-1)', borderRadius: 16, border: '1px solid var(--mantine-color-gray-2)' }}>
+                      <Group gap={6} mb={4}>
+                        <IconAlertCircle size={14} color="gray" />
+                        <Text size="xs" fw={900} tt="uppercase" c="dimmed">Nota Prenotazione</Text>
                       </Group>
-                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckout.staffNoteBooking}</Text>
+                      <Text size="sm" fw={700}>{nextCheckout.staffNoteBooking}</Text>
                     </Box>
                   )}
                 </Stack>
@@ -358,56 +369,62 @@ export default function Home() {
           {/* 1b. Prossimo Check-in */}
           <Card 
             withBorder 
-            radius="xl" 
-            p="md" 
-            shadow="md" 
+            radius="24px" 
+            p="xl" 
+            shadow="xl" 
             style={{ 
-              background: 'linear-gradient(135deg, var(--mantine-color-green-6) 0%, var(--mantine-color-green-8) 100%)',
-              color: 'white',
-              border: 'none'
+              ...glassStyles,
+              background: computedColorScheme === 'dark' 
+                ? 'linear-gradient(135deg, rgba(64, 192, 87, 0.1) 0%, rgba(36, 36, 36, 0.6) 100%)' 
+                : 'linear-gradient(135deg, rgba(64, 192, 87, 0.05) 0%, rgba(255, 255, 255, 0.9) 100%)',
+              borderColor: 'var(--mantine-color-green-light)',
+              overflow: 'hidden',
+              position: 'relative'
             }}
           >
-            <Stack gap="xs">
-              <Group gap="md" wrap="nowrap">
-                <ThemeIcon size={44} radius="lg" color="rgba(255,255,255,0.2)" variant="filled">
-                  <IconLogin size={24} color="white" />
-                </ThemeIcon>
-                <div>
-                  <Text size="xs" fw={700} tt="uppercase" style={{ color: 'rgba(255,255,255,0.7)', lts: '1px' }}>Prossimo Check-in</Text>
+            <Stack gap="md">
+              <Group justify="space-between" wrap="nowrap" align="flex-start">
+                <Stack gap={4}>
+                  <Text size="xs" fw={800} tt="uppercase" c="green.7" lts="1.5px">Prossimo Check-in</Text>
                   {nextCheckin ? (
-                    <>
-                      <Text fw={900} size="lg" lh={1.2}>
+                    <Stack gap={4}>
+                      <Title order={3} fw={900}>
                         {dayjs(nextCheckin.checkIn).format('dddd D MMMM')}
-                      </Text>
-                      <Badge variant="filled" color="rgba(255,255,255,0.2)" size="xs" mt={4}>
-                        {nextCheckin.adults} {nextCheckin.adults === 1 ? 'Adulto' : 'Adulti'}
-                        {nextCheckin.children > 0 && ` + ${nextCheckin.children} ${nextCheckin.children === 1 ? 'Bambino' : 'Bambini'}`}
-                      </Badge>
-                    </>
+                      </Title>
+                      <Group gap={6}>
+                        <Badge variant="dot" color="green.7" size="sm" radius="sm">
+                          {nextCheckin.adults} {nextCheckin.adults === 1 ? 'Adulto' : 'Adulti'}
+                          {nextCheckin.children > 0 && ` + ${nextCheckin.children} ${nextCheckin.children === 1 ? 'Bambino' : 'Bambini'}`}
+                        </Badge>
+                      </Group>
+                    </Stack>
                   ) : (
                     <Text fw={700}>Nessun arrivo previsto</Text>
                   )}
-                </div>
+                </Stack>
+                <ThemeIcon size={52} radius="xl" color="green.7" variant="light" style={{ background: 'var(--mantine-color-green-light)' }}>
+                  <IconLogin size={28} />
+                </ThemeIcon>
               </Group>
 
               {nextCheckin && (nextCheckin.staffNoteCheckIn || nextCheckin.staffNoteBooking) && (
-                <Stack gap={6}>
+                <Stack gap={8} mt="xs">
                   {nextCheckin.staffNoteCheckIn && (
-                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
-                      <Group gap={5} mb={2}>
-                        <IconAlertCircle size={14} color="white" />
-                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Check-in</Text>
+                    <Box p="sm" style={{ background: 'var(--mantine-color-green-light)', borderRadius: 16, border: '1px solid var(--mantine-color-green-1)' }}>
+                      <Group gap={6} mb={4}>
+                        <IconAlertCircle size={14} color="var(--mantine-color-green-8)" />
+                        <Text size="xs" fw={900} tt="uppercase" c="green.9">Nota Check-in</Text>
                       </Group>
-                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckin.staffNoteCheckIn}</Text>
+                      <Text size="sm" fw={700} c="green.9">{nextCheckin.staffNoteCheckIn}</Text>
                     </Box>
                   )}
                   {nextCheckin.staffNoteBooking && (
-                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
-                      <Group gap={5} mb={2}>
-                        <IconAlertCircle size={14} color="white" />
-                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Prenotazione</Text>
+                    <Box p="sm" style={{ background: 'var(--mantine-color-gray-1)', borderRadius: 16, border: '1px solid var(--mantine-color-gray-2)' }}>
+                      <Group gap={6} mb={4}>
+                        <IconAlertCircle size={14} color="gray" />
+                        <Text size="xs" fw={900} tt="uppercase" c="dimmed">Nota Prenotazione</Text>
                       </Group>
-                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckin.staffNoteBooking}</Text>
+                      <Text size="sm" fw={700}>{nextCheckin.staffNoteBooking}</Text>
                     </Box>
                   )}
                 </Stack>
@@ -415,91 +432,110 @@ export default function Home() {
             </Stack>
           </Card>
 
-          {/* 2. Panoramica 7 Giorni (Layout Riparato) */}
+          {/* Agenda Settimanale (Accordion) */}
           <Card 
             withBorder 
-            radius="xl" 
-            p="lg" 
-            shadow="xl"
+            radius="24px" 
+            p={0} 
+            shadow="lg"
             style={{
               ...glassStyles,
               background: computedColorScheme === 'dark' 
-                ? 'rgba(36, 36, 36, 0.6)' 
-                : 'rgba(255, 255, 255, 0.8)',
+                ? 'rgba(36, 36, 36, 0.4)' 
+                : 'rgba(255, 255, 255, 0.6)',
               overflow: 'hidden'
             }}
           >
-            <Stack gap="md">
-              <Stack gap={2}>
-                <Text size="xs" fw={800} tt="uppercase" c="violet.7" lts="1px">I Prossimi 7 giorni</Text>
-                <Title order={4} fw={900}>Panoramica Attività</Title>
-                <Text size="xs" c="dimmed" fw={600}>
-                  {dayjs().add(1, 'day').format('D MMM')} — {dayjs().add(7, 'day').format('D MMM')}
-                </Text>
-              </Stack>
+            <Accordion variant="separated" radius="24px" styles={{
+              item: { border: 'none', background: 'transparent' },
+              control: { padding: '20px 24px' },
+              content: { padding: '0 16px 20px 16px' }
+            }}>
+              <Accordion.Item value="agenda-settimanale">
+                <Accordion.Control>
+                  <Stack gap={2}>
+                    <Text size="xs" fw={800} tt="uppercase" c="violet.7" lts="1.5px">Pianificazione</Text>
+                    <Group gap="xs">
+                      <Title order={4} fw={900}>Agenda Settimanale</Title>
+                      {upcomingActivityCount > 0 && (
+                        <Badge color="violet" variant="light" size="sm">{upcomingActivityCount} attività</Badge>
+                      )}
+                    </Group>
+                    <Text size="xs" c="dimmed" fw={600}>
+                      Prossimi 7 giorni ({dayjs().add(1, 'day').format('D MMM')} — {dayjs().add(7, 'day').format('D MMM')})
+                    </Text>
+                  </Stack>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  <Stack gap={6}>
+                    {Array.from({ length: 7 }).map((_, i) => {
+                      const dayDate = dayjs().add(i + 1, 'day').startOf('day');
+                      const checkIn = bookings.find(b => dayjs(b.checkIn).isSame(dayDate, 'day'));
+                      const checkOut = bookings.find(b => dayjs(b.checkOut).isSame(dayDate, 'day'));
+                      
+                      return (
+                        <Paper 
+                          key={i} 
+                          withBorder 
+                          p="sm" 
+                          radius="xl" 
+                          style={{ 
+                            background: (checkIn || checkOut) ? 'rgba(121, 80, 242, 0.05)' : 'rgba(255,255,255,0.02)',
+                            borderColor: (checkIn || checkOut) ? 'var(--mantine-color-violet-light)' : 'rgba(0,0,0,0.03)'
+                          }}
+                        >
+                          <Group justify="space-between" wrap="nowrap">
+                            <Stack gap={0} style={{ width: 70 }}>
+                              <Text size="9px" fw={800} tt="uppercase" c="dimmed" lh={1.1}>
+                                {dayDate.format('ddd')}
+                              </Text>
+                              <Text size="sm" fw={900}>
+                                {dayDate.format('D MMM')}
+                              </Text>
+                            </Stack>
 
-              <Stack gap={4}>
-                {Array.from({ length: 7 }).map((_, i) => {
-                  const dayDate = dayjs().add(i + 1, 'day').startOf('day');
-                  const checkIn = bookings.find(b => dayjs(b.checkIn).isSame(dayDate, 'day'));
-                  const checkOut = bookings.find(b => dayjs(b.checkOut).isSame(dayDate, 'day'));
-                  
-                  return (
-                    <Paper 
-                      key={i} 
-                      withBorder 
-                      p="xs" 
-                      radius="md" 
-                      style={{ 
-                        background: 'rgba(255,255,255,0.05)',
-                        borderColor: (checkIn || checkOut) ? 'var(--mantine-color-violet-light)' : 'rgba(0,0,0,0.05)'
-                      }}
-                    >
-                      <Group justify="space-between" wrap="nowrap">
-                        <Stack gap={0} style={{ width: 80 }}>
-                          <Text size="xs" fw={800} tt="uppercase" c="dimmed" lh={1.1}>
-                            {dayDate.format('ddd')}
-                          </Text>
-                          <Text size="sm" fw={900}>
-                            {dayDate.format('D MMM')}
-                          </Text>
-                        </Stack>
-
-                        <Group gap="xs" style={{ flex: 1 }}>
-                          {checkOut && (
-                            <Badge color="red" variant="light" size="sm" leftSection={<IconLogout size={10} />}>
-                              Check-out
-                            </Badge>
-                          )}
-                          {checkIn && (
-                            <Badge color="green" variant="light" size="sm" leftSection={<IconLogin size={10} />}>
-                              Check-in
-                            </Badge>
-                          )}
-                          {!checkIn && !checkOut && (
-                            <Text size="xs" c="dimmed" fs="italic">Nessuna attività</Text>
-                          )}
-                        </Group>
-                      </Group>
-                    </Paper>
-                  );
-                })}
-              </Stack>
-
-              <Button 
-                onClick={() => navigate('/prenotazioni')}
-                fullWidth 
-                size="sm" 
-                radius="md" 
-                color="violet"
-                variant="light"
-                rightSection={<IconArrowRight size={16} />}
-                mt="xs"
-              >
-                Vedi Dettagli Prenotazioni
-              </Button>
-            </Stack>
+                            <Group gap="xs" style={{ flex: 1, justifyContent: 'flex-end' }}>
+                              {checkOut && (
+                                <Badge color="red" variant="light" size="xs" radius="sm" leftSection={<IconLogout size={10} />}>
+                                  Out
+                                </Badge>
+                              )}
+                              {checkIn && (
+                                <Badge color="green" variant="light" size="xs" radius="sm" leftSection={<IconLogin size={10} />}>
+                                  In
+                                </Badge>
+                              )}
+                              {!checkIn && !checkOut && (
+                                <Text size="xs" c="dimmed" fs="italic">Libero</Text>
+                              )}
+                            </Group>
+                          </Group>
+                        </Paper>
+                      );
+                    })}
+                  </Stack>
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
           </Card>
+
+          <Button 
+            onClick={() => navigate('/prenotazioni')}
+            fullWidth 
+            size="lg" 
+            radius="24px" 
+            color="violet"
+            variant="gradient"
+            gradient={{ from: 'violet.5', to: 'violet.7', deg: 45 }}
+            leftSection={<IconLayoutGrid size={20} />}
+            rightSection={<IconArrowRight size={18} />}
+            style={{ 
+              boxShadow: '0 8px 24px rgba(121, 80, 242, 0.2)',
+              height: 60
+            }}
+          >
+            Gestione Prenotazioni
+          </Button>
         </Stack>
       )}
     </Stack>
