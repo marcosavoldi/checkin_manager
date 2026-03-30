@@ -153,7 +153,8 @@ export default function ManageBookings() {
           onChange={(v: any) => setFilter(v)}
           radius="xl"
           size="sm"
-          color="blue"
+          transitionDuration={200}
+          color="indigo"
           data={[
             { label: 'Prossime', value: 'future' },
             { label: 'Passate', value: 'past' },
@@ -198,7 +199,7 @@ export default function ManageBookings() {
 
                   <Group gap="xl">
                     <Group gap={6}>
-                      <ThemeIcon color="green" variant="light" size="sm" radius="sm">
+                      <ThemeIcon color="indigo" size="md" radius="sm" variant="light">
                         <IconLogin size={11} />
                       </ThemeIcon>
                       <div>
@@ -331,11 +332,11 @@ export default function ManageBookings() {
             onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, adminNote: v })); }}
             autosize
             minRows={2}
-            styles={{ input: { borderColor: 'var(--mantine-color-violet-3)' } }}
+            styles={{ input: { borderColor: 'var(--mantine-color-indigo-3)' } }}
           />
           <Group justify="flex-end" mt="xs">
             <Button variant="subtle" onClick={close} size="sm">Annulla</Button>
-            <Button onClick={handleSave} loading={saving} disabled={!form.checkIn || !form.checkOut} size="sm">
+            <Button onClick={handleSave} loading={saving} disabled={!form.checkIn || !form.checkOut} size="sm" color="indigo">
               {editingId ? 'Salva Modifiche' : 'Aggiungi'}
             </Button>
           </Group>

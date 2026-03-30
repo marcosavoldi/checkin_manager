@@ -159,7 +159,7 @@ export default function Home() {
                      size={65}
                      thickness={6}
                      roundCaps
-                     sections={[{ value: currentMonth.percent, color: 'violet' }]}
+                     sections={[{ value: currentMonth.percent, color: 'indigo' }]}
                      label={<Text ta="center" size="xs" fw={700}>{currentMonth.percent}%</Text>}
                    />
                  </Group>
@@ -454,11 +454,11 @@ export default function Home() {
               <Accordion.Item value="agenda-settimanale">
                 <Accordion.Control>
                   <Stack gap={2}>
-                    <Text size="xs" fw={800} tt="uppercase" c="violet.7" lts="1.5px">Pianificazione</Text>
+                    <Text size="xs" fw={800} tt="uppercase" c="indigo.7" lts="1.5px">Pianificazione</Text>
                     <Group gap="xs">
                       <Title order={4} fw={900}>Agenda Settimanale</Title>
                       {upcomingActivityCount > 0 && (
-                        <Badge color="violet" variant="light" size="sm">{upcomingActivityCount} attività</Badge>
+                        <Badge color="indigo" variant="light" size="sm">{upcomingActivityCount} attività</Badge>
                       )}
                     </Group>
                     <Text size="xs" c="dimmed" fw={600}>
@@ -481,7 +481,7 @@ export default function Home() {
                           radius="xl" 
                           style={{ 
                             background: (checkIn || checkOut) ? 'rgba(121, 80, 242, 0.05)' : 'rgba(255,255,255,0.02)',
-                            borderColor: (checkIn || checkOut) ? 'var(--mantine-color-violet-light)' : 'rgba(0,0,0,0.03)'
+                            borderColor: (checkIn || checkOut) ? 'var(--mantine-color-indigo-light)' : 'rgba(0,0,0,0.03)'
                           }}
                         >
                           <Group justify="space-between" wrap="nowrap">
@@ -497,12 +497,12 @@ export default function Home() {
                             <Group gap="xs" style={{ flex: 1, justifyContent: 'flex-end' }}>
                               {checkOut && (
                                 <Badge color="red" variant="light" size="xs" radius="sm" leftSection={<IconLogout size={10} />}>
-                                  Out
+                                  Check-out
                                 </Badge>
                               )}
                               {checkIn && (
                                 <Badge color="green" variant="light" size="xs" radius="sm" leftSection={<IconLogin size={10} />}>
-                                  In
+                                  Check-in
                                 </Badge>
                               )}
                               {!checkIn && !checkOut && (
@@ -524,13 +524,13 @@ export default function Home() {
             fullWidth 
             size="lg" 
             radius="24px" 
-            color="violet"
+            color="indigo"
             variant="gradient"
-            gradient={{ from: 'violet.5', to: 'violet.7', deg: 45 }}
+            gradient={{ from: 'indigo.5', to: 'indigo.7', deg: 45 }}
             leftSection={<IconLayoutGrid size={20} />}
             rightSection={<IconArrowRight size={18} />}
             style={{ 
-              boxShadow: '0 8px 24px rgba(121, 80, 242, 0.2)',
+              boxShadow: '0 8px 24px rgba(79, 86, 201, 0.2)',
               height: 60
             }}
           >
@@ -542,7 +542,7 @@ export default function Home() {
   );
 }
 
-function ProgressStack({ occupied, total, color = "violet" }: { occupied: number, total: number, color?: string }) {
+function ProgressStack({ occupied, total, color = "indigo" }: { occupied: number, total: number, color?: string }) {
   return (
     <Stack gap={2} mt="xs">
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>

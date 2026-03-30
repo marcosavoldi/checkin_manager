@@ -149,14 +149,14 @@ export default function StaffManagement() {
         }}>
           <Group justify="space-between" mb="md">
             <Group gap="xs">
-              <ThemeIcon color="violet" size="md" radius="sm" variant="light">
+              <ThemeIcon color="indigo" size="md" radius="sm" variant="light">
                 <IconShieldCheck size={18} />
               </ThemeIcon>
               <Text fw={700} size="sm" c="var(--mantine-color-text)">Admin Autorizzati</Text>
             </Group>
             <Button 
               variant="light" 
-              color="violet" 
+              color="indigo" 
               size="compact-xs" 
               onClick={openAdmin} 
               radius="sm"
@@ -307,7 +307,7 @@ export default function StaffManagement() {
               }}
               radius="md"
             />
-            <Button fullWidth onClick={handleAddAdmin} loading={saving} mt="md" radius="md" size="sm" color="violet">
+            <Button fullWidth onClick={handleAddAdmin} loading={saving} mt="md" radius="md" size="sm" color="indigo">
               Autorizza
             </Button>
           </Stack>

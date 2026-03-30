@@ -128,13 +128,13 @@ export default function BookingDetailModal({ opened, onClose, booking }: Props) 
 
         {/* Nota Admin — visibile solo all'admin */}
         {isAdmin && (
-          <Paper withBorder p="md" radius="md" bg="violet.0"
-            style={{ borderColor: 'var(--mantine-color-violet-3)' }}>
+          <Paper withBorder p="md" radius="md" bg="indigo.0"
+            style={{ borderColor: 'var(--mantine-color-indigo-3)' }}>
             <Group gap="xs" mb="xs">
-              <ThemeIcon color="violet" variant="light" size="sm" radius="sm">
+              <ThemeIcon color="indigo" variant="light" size="sm" radius="sm">
                 <IconLock size={12} />
               </ThemeIcon>
-              <Text size="sm" fw={600} c="violet">Nota Riservata Admin</Text>
+              <Text size="sm" fw={600} c="indigo">Nota Riservata Admin</Text>
             </Group>
             {booking.adminNote ? (
               <Text size="sm">{booking.adminNote}</Text>

@@ -157,7 +157,7 @@ export default function Dashboard() {
             <Badge
               size="xs"
               variant="light"
-              color={isAdmin ? 'violet' : 'gray'}
+              color={isAdmin ? 'indigo' : 'gray'}
               radius="sm"
               style={{ alignSelf: 'flex-start' }}
             >
@@ -187,7 +187,7 @@ export default function Dashboard() {
             radius="xl"
             size="sm"
             transitionDuration={200}
-            color="violet"
+            color="indigo"
             data={[
               { label: 'Prossime', value: 'future' },
               { label: 'Passate', value: 'past' },
@@ -292,7 +292,7 @@ export default function Dashboard() {
                       fullWidth
                       size="xs"
                       variant="light"
-                      color="violet"
+                      color="indigo"
                       mt="md"
                       radius="md"
                       onClick={() => setSelectedBooking(b)}
@@ -345,7 +345,7 @@ export default function Dashboard() {
                       cursor: canClick ? 'pointer' : 'default',
                       borderRadius: 8,
                       fontWeight: isToday ? 700 : undefined,
-                      background: isToday ? 'var(--mantine-color-violet-light)' : undefined,
+                      background: isToday ? 'var(--mantine-color-indigo-light)' : undefined,
                       padding: 4,
                       opacity: (!isAdmin && isPast) ? 0.4 : 1
                     }}
@@ -432,7 +432,7 @@ export default function Dashboard() {
                 </Stack>
 
                 <Button
-                  fullWidth mt="sm" size="xs" variant="light" color="violet" radius="md"
+                  fullWidth mt="sm" size="xs" variant="light" color="indigo" radius="md"
                   onClick={() => { closeDayModal(); setSelectedBooking(b); }}
                 >
                   Note & Dettagli
