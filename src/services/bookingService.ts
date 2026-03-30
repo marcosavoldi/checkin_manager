@@ -72,6 +72,7 @@ export async function addBooking(booking: Omit<Booking, 'id' | 'createdAt'>, use
   const ref = collection(db, COLLECTION);
   return await addDoc(ref, {
     ...booking,
+    staffNote: '', // Puliamo il vecchio campo se presente per completare la migrazione
     checkIn: Timestamp.fromDate(booking.checkIn),
     checkOut: Timestamp.fromDate(booking.checkOut),
     createdAt: serverTimestamp(),
@@ -82,6 +83,7 @@ export async function addBooking(booking: Omit<Booking, 'id' | 'createdAt'>, use
 export async function updateBooking(id: string, booking: Partial<Omit<Booking, 'id' | 'createdAt'>>) {
   const ref = doc(db, COLLECTION, id);
   const data: any = { ...booking };
+  data.staffNote = ''; // Puliamo il vecchio campo se presente per completare la migrazione
   if (booking.checkIn) data.checkIn = Timestamp.fromDate(booking.checkIn);
   if (booking.checkOut) data.checkOut = Timestamp.fromDate(booking.checkOut);
   return await updateDoc(ref, data);
