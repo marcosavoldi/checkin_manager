@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, SimpleGrid, Badge, Button, Box, useComputedColorScheme, Accordion } from '@mantine/core';
+import { Title, Text, Card, Group, Stack, Paper, ThemeIcon, SimpleGrid, Badge, Button, Box, useComputedColorScheme, Accordion } from '@mantine/core';
 import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight, IconLayoutGrid } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -18,8 +18,11 @@ export default function Home() {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const glassStyles = {
     background: computedColorScheme === 'dark' ? 'rgba(36, 36, 36, 0.4)' : 'rgba(255, 255, 255, 0.7)',
-    backdropFilter: 'blur(10px)',
-    border: computedColorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)',
+    backdropFilter: 'blur(12px)',
+    border: computedColorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.4)',
+    boxShadow: computedColorScheme === 'dark' 
+      ? '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 0 1px rgba(255, 255, 255, 0.05)'
+      : '0 8px 32px 0 rgba(31, 38, 135, 0.07), inset 0 0 0 1px rgba(255, 255, 255, 0.5)',
   };
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -139,28 +142,51 @@ export default function Home() {
             <Accordion.Item value="occupazione">
               <Accordion.Control>
                 <Stack gap={2}>
-                  <Text size="xs" fw={800} tt="uppercase" c="indigo.7" lts="1.5px">Statistiche</Text>
+                  <Text size="11px" fw={900} tt="uppercase" c="indigo.6" lts="1.8px">Analisi Dati</Text>
                   <Title order={4} fw={900}>Occupazione Trimestrale</Title>
-                  <Text size="xs" c="dimmed" fw={600}>
-                    {currentMonth.label}, {nextMonth.label} e {followingMonth.label}
+                  <Text size="11px" c="dimmed" fw={600} lts="0.3px">
+                    Proiezioni per {currentMonth.label}, {nextMonth.label} e {followingMonth.label}
                   </Text>
                 </Stack>
               </Accordion.Control>
               <Accordion.Panel>
-                <Grid gutter="md">
+                <Stack gap="md">
                   {[currentMonth, nextMonth, followingMonth].map((m, idx) => (
-                    <Grid.Col span={{ base: 12, md: 4 }} key={idx}>
-                      <Paper withBorder p="md" radius="xl" style={{ background: 'rgba(0,0,0,0.02)' }}>
-                        <Group justify="space-between" wrap="nowrap" mb="xs">
-                          <Text size="xs" fw={800} tt="uppercase" c="dimmed">{m.label}</Text>
-                          <Badge size="xs" variant="light" color={idx === 0 ? 'indigo' : 'blue'}>{m.percent}%</Badge>
-                        </Group>
-                        <Title order={4} mb={4}>{m.occupied} / {m.total} notti</Title>
-                        <ProgressStack occupied={m.occupied} total={m.total} color={idx === 0 ? 'indigo' : 'blue'} />
-                      </Paper>
-                    </Grid.Col>
+                    <Paper 
+                      key={idx} 
+                      withBorder 
+                      p="lg" 
+                      radius="20px" 
+                      style={{ 
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(0, 0, 0, 0.04)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)'
+                      }}
+                    >
+                      <Group justify="space-between" wrap="nowrap">
+                        <Box style={{ flex: 1 }}>
+                          <Group gap="xs" mb={4}>
+                            <Text size="xs" fw={900} tt="uppercase" c="dimmed" lts="1.2px">{m.label}</Text>
+                            <Badge size="xs" variant="gradient" gradient={{ from: 'indigo.5', to: 'indigo.8' }}>{m.percent}%</Badge>
+                          </Group>
+                          <Title order={3} fw={900} style={{ letterSpacing: '-0.5px' }}>{m.occupied} <Text span size="sm" fw={600} c="dimmed">/ {m.total} notti</Text></Title>
+                        </Box>
+                        
+                        <Box style={{ position: 'relative', height: 48, width: '40%' }}>
+                          <Text size="10px" fw={800} c="dimmed" ta="right" mb={4} tt="uppercase">Libere: {m.total - m.occupied}</Text>
+                          <div style={{ height: 8, background: 'var(--mantine-color-gray-1)', borderRadius: 10, overflow: 'hidden' }}>
+                            <div style={{ 
+                              height: '100%', 
+                              width: `${m.percent}%`, 
+                              background: 'linear-gradient(90deg, var(--mantine-color-indigo-4) 0%, var(--mantine-color-indigo-7) 100%)',
+                              borderRadius: 10
+                            }} />
+                          </div>
+                        </Box>
+                      </Group>
+                    </Paper>
                   ))}
-                </Grid>
+                </Stack>
               </Accordion.Panel>
             </Accordion.Item>
 
@@ -169,40 +195,40 @@ export default function Home() {
               <Accordion.Item value="biancheria">
                 <Accordion.Control>
                   <Stack gap={2}>
-                    <Text size="xs" fw={800} tt="uppercase" c="teal.7" lts="1.5px">Operativo</Text>
+                    <Text size="11px" fw={900} tt="uppercase" c="teal.7" lts="1.8px">Operatività</Text>
                     <Group gap="xs">
                       <Title order={4} fw={900}>Inventario Biancheria</Title>
                       {(inventory.bedKits === 0 && inventory.towelKits === 0) && (
-                        <Badge color="orange" size="xs">Richiesto</Badge>
+                        <Badge color="orange" size="xs" radius="sm">Richiesto</Badge>
                       )}
                     </Group>
                   </Stack>
                 </Accordion.Control>
                 <Accordion.Panel>
                   {(inventory.bedKits === 0 && inventory.towelKits === 0) ? (
-                    <Stack align="center" py="sm" gap="xs">
-                      <Text size="sm" ta="center" c="dimmed">Benvenuto! Imposta disponibilità iniziale di kit puliti.</Text>
+                    <Stack align="center" py="lg" gap="sm">
+                      <Text size="sm" ta="center" c="dimmed" fw={500}>Imponta la tua disponibilità iniziale di kit puliti.</Text>
                       <Button variant="light" color="indigo" size="xs" radius="xl" onClick={() => navigate('/biancheria')}>
                         Configura ora
                       </Button>
                     </Stack>
                   ) : (
                     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                      <Paper withBorder p="md" radius="xl" style={{ background: 'rgba(0,0,0,0.02)' }}>
-                        <Group gap="md">
-                          <ThemeIcon size="md" radius="xl" color="indigo" variant="light"><IconBed size={18} /></ThemeIcon>
+                      <Paper withBorder p="lg" radius="20px" style={{ background: 'linear-gradient(135deg, rgba(76, 110, 245, 0.05) 0%, rgba(255, 255, 255, 0) 100%)', borderColor: 'rgba(76, 110, 245, 0.15)' }}>
+                        <Group gap="lg" wrap="nowrap">
+                          <ThemeIcon size={44} radius="12px" color="indigo" variant="gradient" gradient={{ from: 'indigo.4', to: 'indigo.7' }}><IconBed size={22} stroke={2} /></ThemeIcon>
                           <div>
-                            <Text size="xs" c="dimmed" fw={700}>KIT LETTO</Text>
-                            <Title order={3}>{inventory.bedKits}</Title>
+                            <Text size="10px" fw={900} c="indigo.8" tt="uppercase" mb={2} lts="1.2px">Kit Letto</Text>
+                            <Title order={2} fw={900} style={{ lineHeight: 1 }}>{inventory.bedKits}</Title>
                           </div>
                         </Group>
                       </Paper>
-                      <Paper withBorder p="md" radius="xl" style={{ background: 'rgba(0,0,0,0.02)' }}>
-                        <Group gap="md">
-                          <ThemeIcon size="md" radius="xl" color="teal" variant="light"><IconBath size={18} /></ThemeIcon>
+                      <Paper withBorder p="lg" radius="20px" style={{ background: 'linear-gradient(135deg, rgba(18, 184, 134, 0.05) 0%, rgba(255, 255, 255, 0) 100%)', borderColor: 'rgba(18, 184, 134, 0.15)' }}>
+                        <Group gap="lg" wrap="nowrap">
+                          <ThemeIcon size={44} radius="12px" color="teal" variant="gradient" gradient={{ from: 'teal.4', to: 'teal.7' }}><IconBath size={22} stroke={2} /></ThemeIcon>
                           <div>
-                            <Text size="xs" c="dimmed" fw={700}>KIT ASCIUGAMANI</Text>
-                            <Title order={3}>{inventory.towelKits}</Title>
+                            <Text size="10px" fw={900} c="teal.8" tt="uppercase" mb={2} lts="1.2px">Kit Asciugamani</Text>
+                            <Title order={2} fw={900} style={{ lineHeight: 1 }}>{inventory.towelKits}</Title>
                           </div>
                         </Group>
                       </Paper>
@@ -216,17 +242,19 @@ export default function Home() {
             <Accordion.Item value="agenda">
               <Accordion.Control>
                 <Stack gap={2}>
-                  <Text size="xs" fw={800} tt="uppercase" c="indigo.7" lts="1.5px">Pianificazione</Text>
+                  <Text size="11px" fw={900} tt="uppercase" c="indigo.6" lts="1.8px">Logistica</Text>
                   <Group gap="xs">
                     <Title order={4} fw={900}>Agenda Settimanale</Title>
                     {upcomingActivityCount > 0 && (
-                      <Badge color="indigo" variant="light" size="sm">{upcomingActivityCount} attività</Badge>
+                      <Badge variant="filled" color="indigo.7" size="sm" radius="sm">{upcomingActivityCount} TASK</Badge>
                     )}
                   </Group>
                 </Stack>
               </Accordion.Control>
               <Accordion.Panel>
-                <AgendaPanel bookings={bookings} />
+                <div style={{ paddingTop: '8px' }}>
+                  <AgendaPanel bookings={bookings} />
+                </div>
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
@@ -421,65 +449,51 @@ export default function Home() {
   );
 }
 
-function ProgressStack({ occupied, total, color = "indigo" }: { occupied: number, total: number, color?: string }) {
-  return (
-    <Stack gap={2} mt="xs">
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Text size="10px" c="dimmed">Libere: {total - occupied}</Text>
-      </div>
-      <div style={{ height: 4, background: 'var(--mantine-color-gray-2)', borderRadius: 2, overflow: 'hidden', width: '100px' }}>
-        <div style={{ 
-          height: '100%', 
-          width: `${(occupied / total) * 100}%`, 
-          background: `var(--mantine-color-${color}-6)` 
-        }} />
-      </div>
-    </Stack>
-  );
-}
-
 function AgendaPanel({ bookings }: { bookings: Booking[] }) {
   return (
-    <Stack gap={6}>
+    <Stack gap={10}>
       {Array.from({ length: 7 }).map((_, i) => {
         const dayDate = dayjs().add(i + 1, 'day').startOf('day');
         const checkIn = bookings.find(b => dayjs(b.checkIn).isSame(dayDate, 'day'));
         const checkOut = bookings.find(b => dayjs(b.checkOut).isSame(dayDate, 'day'));
+        const hasActivity = checkIn || checkOut;
 
         return (
           <Paper
             key={i}
             withBorder
             p="sm"
-            radius="xl"
+            radius="16px"
             style={{
-              background: (checkIn || checkOut) ? 'rgba(121, 80, 242, 0.05)' : 'rgba(255,255,255,0.02)',
-              borderColor: (checkIn || checkOut) ? 'var(--mantine-color-indigo-light)' : 'rgba(0,0,0,0.03)'
+              background: hasActivity ? 'rgba(76, 110, 245, 0.03)' : 'transparent',
+              borderColor: hasActivity ? 'rgba(76, 110, 245, 0.2)' : 'rgba(0,0,0,0.05)',
+              transition: 'transform 0.2s ease',
+              boxShadow: hasActivity ? '0 4px 12px rgba(76, 110, 245, 0.05)' : 'none'
             }}
           >
             <Group justify="space-between" wrap="nowrap">
-              <Stack gap={0} style={{ width: 70 }}>
-                <Text size="9px" fw={800} tt="uppercase" c="dimmed" lh={1.1}>
-                  {dayDate.format('ddd')}
+              <Stack gap={0} style={{ width: 80 }}>
+                <Text size="10px" fw={900} tt="uppercase" c="indigo.8" lh={1.1} lts="0.5px">
+                  {dayDate.format('dddd')}
                 </Text>
-                <Text size="sm" fw={900}>
+                <Text size="md" fw={900} style={{ letterSpacing: '-0.5px' }}>
                   {dayDate.format('D MMM')}
                 </Text>
               </Stack>
 
-              <Group gap="xs" style={{ flex: 1, justifyContent: 'flex-end' }}>
+              <Group gap={8} style={{ flex: 1, justifyContent: 'flex-end' }}>
                 {checkOut && (
-                  <Badge color="red" variant="light" size="xs" radius="sm" leftSection={<IconLogout size={10} />}>
-                    Check-out
+                  <Badge color="red.7" variant="outline" size="sm" radius="6px" leftSection={<IconLogout size={12} stroke={2.5} />} styles={{ label: { fontWeight: 800 } }}>
+                    CHECK-OUT
                   </Badge>
                 )}
                 {checkIn && (
-                  <Badge color="green" variant="light" size="xs" radius="sm" leftSection={<IconLogin size={10} />}>
-                    Check-in
+                  <Badge color="green.7" variant="outline" size="sm" radius="6px" leftSection={<IconLogin size={12} stroke={2.5} />} styles={{ label: { fontWeight: 800 } }}>
+                    CHECK-IN
                   </Badge>
                 )}
-                {!checkIn && !checkOut && (
-                  <Text size="xs" c="dimmed" fs="italic">Libero</Text>
+                {!hasActivity && (
+                  <Text size="xs" c="dimmed" fw={600} fs="italic">Libero</Text>
                 )}
               </Group>
             </Group>
