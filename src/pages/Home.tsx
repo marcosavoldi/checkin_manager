@@ -330,14 +330,27 @@ export default function Home() {
                 </div>
               </Group>
               
-              {nextCheckout?.staffNote && (
-                <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
-                  <Group gap={5} mb={2}>
-                    <IconAlertCircle size={14} color="white" />
-                    <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota</Text>
-                  </Group>
-                  <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckout.staffNote}</Text>
-                </Box>
+              {nextCheckout && (nextCheckout.staffNoteCheckOut || nextCheckout.staffNoteBooking) && (
+                <Stack gap={6}>
+                  {nextCheckout.staffNoteCheckOut && (
+                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
+                      <Group gap={5} mb={2}>
+                        <IconAlertCircle size={14} color="white" />
+                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Check-out</Text>
+                      </Group>
+                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckout.staffNoteCheckOut}</Text>
+                    </Box>
+                  )}
+                  {nextCheckout.staffNoteBooking && (
+                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
+                      <Group gap={5} mb={2}>
+                        <IconAlertCircle size={14} color="white" />
+                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Prenotazione</Text>
+                      </Group>
+                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckout.staffNoteBooking}</Text>
+                    </Box>
+                  )}
+                </Stack>
               )}
             </Stack>
           </Card>
@@ -371,14 +384,27 @@ export default function Home() {
                 </div>
               </Group>
 
-              {nextCheckin?.staffNote && (
-                <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
-                  <Group gap={5} mb={2}>
-                    <IconAlertCircle size={14} color="white" />
-                    <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota</Text>
-                  </Group>
-                  <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckin.staffNote}</Text>
-                </Box>
+              {nextCheckin && (nextCheckin.staffNoteCheckIn || nextCheckin.staffNoteBooking) && (
+                <Stack gap={6}>
+                  {nextCheckin.staffNoteCheckIn && (
+                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
+                      <Group gap={5} mb={2}>
+                        <IconAlertCircle size={14} color="white" />
+                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Check-in</Text>
+                      </Group>
+                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckin.staffNoteCheckIn}</Text>
+                    </Box>
+                  )}
+                  {nextCheckin.staffNoteBooking && (
+                    <Box p="xs" style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.2)' }}>
+                      <Group gap={5} mb={2}>
+                        <IconAlertCircle size={14} color="white" />
+                        <Text size="xs" fw={800} tt="uppercase" style={{ color: 'white' }}>Nota Prenotazione</Text>
+                      </Group>
+                      <Text size="sm" fw={600} style={{ color: 'white' }}>{nextCheckin.staffNoteBooking}</Text>
+                    </Box>
+                  )}
+                </Stack>
               )}
             </Stack>
           </Card>

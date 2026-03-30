@@ -21,21 +21,21 @@ export interface Booking {
   checkOut: Date;
   source: BookingSource;
   guestName?: string;
-  staffNote?: string;   // nota visibile a staff e admin
-  adminNote?: string;   // nota visibile solo all'admin
-  adults: number;       // numero adulti
-  children: number;     // numero bambini
+  staffNoteCheckIn?: string;  // Nota specifica per l'arrivo
+  staffNoteCheckOut?: string; // Nota specifica per la partenza
+  staffNoteBooking?: string;  // Nota generale per l'intera prenotazione
+  adminNote?: string;          // nota visibile solo all'admin
+  adults: number;              // numero adulti
+  children: number;            // numero bambini
   createdAt?: any;
   createdBy?: string;
-  linenAccounted?: boolean; // Se i kit sono già stati detratti dall'inventario
+  linenAccounted?: boolean;    // Se i kit sono già stati detratti dall'inventario
 }
 
 const COLLECTION = 'bookings';
 
 export async function fetchUpcomingBookings(): Promise<Booking[]> {
   const ref = collection(db, COLLECTION);
-  // Mostriamo prenotazioni che non siano terminate più di 90 giorni fa (circa 3 mesi)
-  // Nota: Firebase mantiene tutti i dati per sempre, questo è solo un filtro di caricamento.
   const limitDate = new Date();
   limitDate.setDate(limitDate.getDate() - 90);
 
@@ -54,7 +54,10 @@ export async function fetchUpcomingBookings(): Promise<Booking[]> {
       checkOut: (data.checkOut as Timestamp).toDate(),
       source: data.source as BookingSource,
       guestName: data.guestName || '',
-      staffNote: data.staffNote || '',
+      staffNoteCheckIn: data.staffNoteCheckIn || '',
+      staffNoteCheckOut: data.staffNoteCheckOut || '',
+      // Migrazione: se esiste la vecchia 'staffNote', caricala qui
+      staffNoteBooking: data.staffNoteBooking || data.staffNote || '',
       adminNote: data.adminNote || '',
       adults: data.adults || 0,
       children: data.children || 0,

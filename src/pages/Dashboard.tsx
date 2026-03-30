@@ -41,39 +41,38 @@ function getBookingsForDay(bookings: Booking[], date: Date) {
 
 const NOTE_THRESHOLD = 120;
 
-function StaffNote({ note, isAdmin }: { note: string; isAdmin?: boolean }) {
+function StaffNote({ note, label, icon: Icon = IconNotes }: { note?: string; label: string; icon?: any }) {
   const [expanded, setExpanded] = useState(false);
   if (!note) return null;
   const isLong = note.length > NOTE_THRESHOLD;
   return (
     <Box
-      mt={14}
+      mt={10}
       p="xs"
       style={{
-        background: 'rgba(255, 145, 0, 0.1)',
+        background: 'rgba(255, 145, 0, 0.08)',
         borderRadius: 12,
-        border: '2px solid #ff9100',
-        boxShadow: '0 4px 12px rgba(255, 145, 0, 0.25)',
+        border: '1.5px solid #ff9100',
         position: 'relative',
         overflow: 'hidden'
       }}
     >
-      <Group gap={6} mb={6}>
-        <ThemeIcon variant="filled" color="orange" size="sm" radius="xl">
-          <IconNotes size={12} stroke={2.5} />
+      <Group gap={6} mb={4}>
+        <ThemeIcon variant="transparent" color="orange.8" size="sm">
+          <Icon size={12} stroke={2.5} />
         </ThemeIcon>
-        <Text size="xs" fw={900} c="orange.8" tt="uppercase" style={{ letterSpacing: 1 }}>
-          {isAdmin ? 'Nota Staff Importante' : 'Note'}
+        <Text size="10px" fw={900} c="orange.8" tt="uppercase" style={{ letterSpacing: 1 }}>
+          {label}
         </Text>
       </Group>
       {isLong ? (
         <>
           <Collapse in={expanded}>
-            <Text size="sm" fw={700} c="var(--mantine-color-text)" style={{ lineHeight: 1.5 }}>{note}</Text>
+            <Text size="sm" fw={700} c="var(--mantine-color-text)" style={{ lineHeight: 1.4 }}>{note}</Text>
           </Collapse>
-          {!expanded && <Text size="sm" fw={700} c="var(--mantine-color-text)" lineClamp={2} style={{ lineHeight: 1.5 }}>{note}</Text>}
+          {!expanded && <Text size="sm" fw={700} c="var(--mantine-color-text)" lineClamp={2} style={{ lineHeight: 1.4 }}>{note}</Text>}
           <Button
-            size="compact-xs" variant="subtle" color="orange" mt={6} p={0}
+            size="compact-xs" variant="subtle" color="orange" mt={4} p={0}
             rightSection={expanded ? <IconChevronUp size={10} /> : <IconChevronDown size={10} />}
             onClick={() => setExpanded(e => !e)}
             style={{ height: 'auto' }}
@@ -82,7 +81,7 @@ function StaffNote({ note, isAdmin }: { note: string; isAdmin?: boolean }) {
           </Button>
         </>
       ) : (
-        <Text size="sm" fw={700} c="var(--mantine-color-text)" style={{ lineHeight: 1.5 }}>{note}</Text>
+        <Text size="sm" fw={700} c="var(--mantine-color-text)" style={{ lineHeight: 1.4 }}>{note}</Text>
       )}
     </Box>
   );
@@ -280,8 +279,12 @@ export default function Dashboard() {
                     </Paper>
                   </Group>
 
-                  {/* Row 4: Staff note */}
-                  {b.staffNote && <StaffNote note={b.staffNote} isAdmin={isAdmin} />}
+                  {/* Row 4: Staff notes */}
+                  <Stack gap={0}>
+                    <StaffNote note={b.staffNoteCheckIn} label="Nota Check-in" icon={IconLogin} />
+                    <StaffNote note={b.staffNoteCheckOut} label="Nota Check-out" icon={IconLogout} />
+                    <StaffNote note={b.staffNoteBooking} label="Nota Prenotazione" />
+                  </Stack>
 
                   {/* Row 5: CTA button (Admin ONLY) */}
                   {isAdmin && (
@@ -421,8 +424,12 @@ export default function Dashboard() {
                   </Box>
                 </Group>
 
-                {/* Staff note */}
-                {b.staffNote && <StaffNote note={b.staffNote} isAdmin={isAdmin} />}
+                {/* Staff notes */}
+                <Stack gap={0}>
+                  <StaffNote note={b.staffNoteCheckIn} label="Nota Check-in" icon={IconLogin} />
+                  <StaffNote note={b.staffNoteCheckOut} label="Nota Check-out" icon={IconLogout} />
+                  <StaffNote note={b.staffNoteBooking} label="Nota Prenotazione" />
+                </Stack>
 
                 <Button
                   fullWidth mt="sm" size="xs" variant="light" color="violet" radius="md"

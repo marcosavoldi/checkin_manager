@@ -1,7 +1,7 @@
 import {
   Modal, Text, Group, Stack, Badge, Paper, ThemeIcon, Divider
 } from '@mantine/core';
-import { IconUsers, IconLock } from '@tabler/icons-react';
+import { IconUsers, IconLock, IconLogin, IconLogout, IconNotes } from '@tabler/icons-react';
 import { type Booking } from '../services/bookingService';
 import { useAuth } from '../context/AuthContext';
 import dayjs from 'dayjs';
@@ -81,22 +81,50 @@ export default function BookingDetailModal({ opened, onClose, booking }: Props) 
           </Paper>
         </Group>
 
-        <Divider label="Note" labelPosition="center" />
+        <Divider label="Note per lo Staff" labelPosition="center" />
 
-        {/* Nota Staff */}
-        <Paper withBorder p="md" radius="md" bg="blue.0">
-          <Group gap="xs" mb="xs">
-            <ThemeIcon color="blue" variant="light" size="sm" radius="sm">
-              <IconUsers size={12} />
-            </ThemeIcon>
-            <Text size="sm" fw={600} c="blue">Nota Staff</Text>
-          </Group>
-          {booking.staffNote ? (
-            <Text size="sm">{booking.staffNote}</Text>
-          ) : (
-            <Text size="sm" c="dimmed" fs="italic">Nessuna nota per lo staff.</Text>
-          )}
-        </Paper>
+        {/* Note Check-in */}
+        {booking.staffNoteCheckIn && (
+          <Paper withBorder p="md" radius="md" bg="green.0">
+            <Group gap="xs" mb="xs">
+              <ThemeIcon color="green" variant="light" size="sm" radius="sm">
+                <IconLogin size={12} />
+              </ThemeIcon>
+              <Text size="sm" fw={600} c="green.9">Nota Check-in</Text>
+            </Group>
+            <Text size="sm">{booking.staffNoteCheckIn}</Text>
+          </Paper>
+        )}
+
+        {/* Note Check-out */}
+        {booking.staffNoteCheckOut && (
+          <Paper withBorder p="md" radius="md" bg="red.0">
+            <Group gap="xs" mb="xs">
+              <ThemeIcon color="red" variant="light" size="sm" radius="sm">
+                <IconLogout size={12} />
+              </ThemeIcon>
+              <Text size="sm" fw={600} c="red.9">Nota Check-out</Text>
+            </Group>
+            <Text size="sm">{booking.staffNoteCheckOut}</Text>
+          </Paper>
+        )}
+
+        {/* Nota Prenotazione */}
+        {booking.staffNoteBooking && (
+          <Paper withBorder p="md" radius="md" bg="blue.0">
+            <Group gap="xs" mb="xs">
+              <ThemeIcon color="blue" variant="light" size="sm" radius="sm">
+                <IconNotes size={12} stroke={1.5} />
+              </ThemeIcon>
+              <Text size="sm" fw={600} c="blue.9">Nota Prenotazione</Text>
+            </Group>
+            <Text size="sm">{booking.staffNoteBooking}</Text>
+          </Paper>
+        )}
+
+        {(!booking.staffNoteCheckIn && !booking.staffNoteCheckOut && !booking.staffNoteBooking) && (
+          <Text size="sm" c="dimmed" ta="center" fs="italic">Nessuna nota per lo staff.</Text>
+        )}
 
         {/* Nota Admin — visibile solo all'admin */}
         {isAdmin && (

@@ -32,7 +32,9 @@ const EMPTY_FORM = {
   checkOut: null as DateValue,
   source: 'airbnb' as BookingSource,
   guestName: '',
-  staffNote: '',
+  staffNoteCheckIn: '',
+  staffNoteCheckOut: '',
+  staffNoteBooking: '',
   adminNote: '',
   adults: 2,
   children: 0
@@ -77,7 +79,9 @@ export default function ManageBookings() {
     setForm({
       checkIn: b.checkIn, checkOut: b.checkOut,
       source: b.source, guestName: b.guestName || '',
-      staffNote: b.staffNote || '',
+      staffNoteCheckIn: b.staffNoteCheckIn || '',
+      staffNoteCheckOut: b.staffNoteCheckOut || '',
+      staffNoteBooking: b.staffNoteBooking || '',
       adminNote: b.adminNote || '',
       adults: b.adults || 0,
       children: b.children || 0
@@ -94,7 +98,9 @@ export default function ManageBookings() {
       const payload = {
         checkIn, checkOut, source: form.source,
         guestName: form.guestName,
-        staffNote: form.staffNote,
+        staffNoteCheckIn: form.staffNoteCheckIn,
+        staffNoteCheckOut: form.staffNoteCheckOut,
+        staffNoteBooking: form.staffNoteBooking,
         adminNote: form.adminNote,
         adults: form.adults,
         children: form.children
@@ -276,14 +282,34 @@ export default function ManageBookings() {
             value={form.guestName}
             onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, guestName: v })); }}
           />
+          
+          <Divider label="Note per lo Staff" labelPosition="center" color="blue.2" />
+          
           <Textarea
-            label="🟦 Nota Staff (visibile a tutto lo staff)"
-            placeholder="es. Pannello elettrico sx, spugne blu sotto il lavandino..."
-            value={form.staffNote}
-            onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, staffNote: v })); }}
+            label="📥 Nota Check-in"
+            placeholder="es. Consegna chiavi alle 15:00, mostrare caldaia..."
+            value={form.staffNoteCheckIn}
+            onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, staffNoteCheckIn: v })); }}
             autosize
             minRows={2}
           />
+          <Textarea
+            label="📤 Nota Check-out"
+            placeholder="es. Controllare telecomando, ritiro spazzatura..."
+            value={form.staffNoteCheckOut}
+            onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, staffNoteCheckOut: v })); }}
+            autosize
+            minRows={2}
+          />
+          <Textarea
+            label="📝 Nota Prenotazione"
+            placeholder="es. Pannello elettrico sx, spugne blu sotto il lavandino..."
+            value={form.staffNoteBooking}
+            onChange={e => { const v = e.currentTarget.value; setForm(f => ({ ...f, staffNoteBooking: v })); }}
+            autosize
+            minRows={2}
+          />
+
           <Group grow>
             <NumberInput
               label="Adulti"
