@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import {
   Title, Button, Group, Stack, Text, Card, Badge,
-  Modal, TextInput, Textarea, Select, ActionIcon, Tooltip,
-  Box, Divider, ThemeIcon, Paper, NumberInput, SegmentedControl, Center, Affix
+  Modal, TextInput, Textarea, Select, ActionIcon,
+  Box, Divider, Paper, NumberInput, SegmentedControl, Center, Affix
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit, IconTrash, IconCalendarPlus, IconLogin, IconLogout, IconPlus } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconCalendarPlus, IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, addBooking, updateBooking, deleteBooking, type Booking, type BookingSource } from '../services/bookingService';
 import dayjs from 'dayjs';
@@ -179,62 +179,73 @@ export default function ManageBookings() {
         </Paper>
       ) : (
         <Stack gap="md">
-          {filteredBookings.map(b => (
-            <Card key={b.id} withBorder shadow="xs" radius="lg" padding="md">
-              <Group justify="space-between" align="flex-start">
-                <Group gap="md" align="flex-start" style={{ flex: 1 }}>
-                  <Box>
-                    <Badge color={SOURCE_COLORS[b.source]} variant="light" size="sm" mb={4}>
-                      {SOURCE_LABELS[b.source]}
-                    </Badge>
-                    {b.guestName && <Text fw={600} size="sm">{b.guestName}</Text>}
-                    <Group gap={4} mt={3}>
-                      <Badge variant="transparent" color="gray" size="xs" p={0}>
-                        {b.adults} Adulti {b.children > 0 && `, ${b.children} Bambini`}
-                      </Badge>
-                    </Group>
-                  </Box>
+          {filteredBookings.map(b => {
+            const nights = dayjs(b.checkOut).diff(dayjs(b.checkIn), 'day');
+            return (
+              <Card key={b.id} withBorder shadow="sm" radius="lg" padding="md">
+                <Stack gap="sm">
+                  {/* Header: Info Ospite + Azioni */}
+                  <Group justify="space-between" align="flex-start" wrap="nowrap">
+                    <Stack gap={2}>
+                      <Group gap="xs">
+                        <Badge color={SOURCE_COLORS[b.source]} variant="light" size="xs">
+                          {SOURCE_LABELS[b.source]}
+                        </Badge>
+                        {b.guestName ? (
+                          <Text fw={800} size="sm" truncate>{b.guestName}</Text>
+                        ) : (
+                          <Text fw={700} size="sm" c="dimmed" fs="italic">Ospite</Text>
+                        )}
+                      </Group>
+                      <Text size="xs" c="dimmed" fw={600}>
+                        {b.adults} {b.adults === 1 ? 'Adulto' : 'Adulti'}
+                        {b.children > 0 && ` + ${b.children} ${b.children === 1 ? 'Bambino' : 'Bambini'}`}
+                      </Text>
+                    </Stack>
 
-                  <Divider orientation="vertical" />
-
-                  <Group gap="xl">
-                    <Group gap={6}>
-                      <ThemeIcon color="indigo" size="md" radius="sm" variant="light">
-                        <IconLogin size={11} />
-                      </ThemeIcon>
-                      <div>
-                        <Text size="xs" c="dimmed">Check-in</Text>
-                        <Text fw={700} size="sm" c="green">{dayjs(b.checkIn).format('ddd DD MMM')}</Text>
-                      </div>
-                    </Group>
-
-                    <Group gap={6}>
-                      <ThemeIcon color="red" variant="light" size="sm" radius="sm">
-                        <IconLogout size={11} />
-                      </ThemeIcon>
-                      <div>
-                        <Text size="xs" c="dimmed">Check-out</Text>
-                        <Text fw={700} size="sm" c="red">{dayjs(b.checkOut).format('ddd DD MMM')}</Text>
-                      </div>
+                    <Group gap={4}>
+                      <ActionIcon variant="subtle" color="blue" onClick={() => openEdit(b)} size="sm">
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(b.id!)} size="sm">
+                        <IconTrash size={16} />
+                      </ActionIcon>
                     </Group>
                   </Group>
-                </Group>
 
-                <Group gap="xs" style={{ flexShrink: 0 }}>
-                  <Tooltip label="Modifica">
-                    <ActionIcon variant="subtle" color="blue" onClick={() => openEdit(b)}>
-                      <IconEdit size={15} />
-                    </ActionIcon>
-                  </Tooltip>
-                  <Tooltip label="Elimina">
-                    <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(b.id!)}>
-                      <IconTrash size={15} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-              </Group>
-            </Card>
-          ))}
+                  {/* Barra Date: Split Check-in / Out */}
+                  <Paper withBorder p={4} radius="md" style={{ background: 'rgba(0,0,0,0.02)', borderColor: 'rgba(0,0,0,0.05)' }}>
+                    <Group grow gap={0} wrap="nowrap">
+                      {/* Check-in */}
+                      <Stack gap={0} align="center" style={{ flex: 1 }}>
+                        <Text size="9px" fw={800} tt="uppercase" c="dimmed">Check-in</Text>
+                        <Text fw={700} size="sm" c="green.7">
+                          {dayjs(b.checkIn).format('ddd DD MMM')}
+                        </Text>
+                      </Stack>
+
+                      {/* Divider con Notti */}
+                      <Stack gap={0} align="center" style={{ width: 60 }}>
+                        <Divider orientation="vertical" h={15} style={{ opacity: 0.3 }} />
+                        <Badge variant="outline" color="gray" size="xs" radius="sm" fw={800} style={{ fontSize: '8px', height: '14px', padding: '0 4px', borderStyle: 'dashed' }}>
+                          {nights} {nights === 1 ? 'NOTTE' : 'NOTTI'}
+                        </Badge>
+                        <Divider orientation="vertical" h={15} style={{ opacity: 0.3 }} />
+                      </Stack>
+
+                      {/* Check-out */}
+                      <Stack gap={0} align="center" style={{ flex: 1 }}>
+                        <Text size="9px" fw={800} tt="uppercase" c="dimmed">Check-out</Text>
+                        <Text fw={700} size="sm" c="red.7">
+                          {dayjs(b.checkOut).format('ddd DD MMM')}
+                        </Text>
+                      </Stack>
+                    </Group>
+                  </Paper>
+                </Stack>
+              </Card>
+            );
+          })}
         </Stack>
       )}
 
