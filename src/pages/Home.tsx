@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, RingProgress, Divider, SimpleGrid, Badge, Button, Box, useComputedColorScheme, Accordion } from '@mantine/core';
+import { Title, Text, Card, Group, Stack, Grid, Paper, ThemeIcon, SimpleGrid, Badge, Button, Box, useComputedColorScheme, Accordion } from '@mantine/core';
 import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight, IconLayoutGrid } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -73,8 +73,6 @@ export default function Home() {
 
   // --- LOGICA DATE ---
   const today = dayjs().startOf('day');
-  const startOfThisWeek = dayjs().startOf('week'); // Locale 'it' -> Lunedì
-  const endOfThisWeek = dayjs().endOf('week');
 
   // --- LOGICA ADMIN: Occupazione ---
   const getOccupancy = (monthOffset: number) => {
@@ -103,6 +101,7 @@ export default function Home() {
 
   const currentMonth = getOccupancy(0);
   const nextMonth = getOccupancy(1);
+  const followingMonth = getOccupancy(2);
 
   // --- LOGICA PROSSIMI EVENTI (Admin & Staff) ---
   const tomorrow = dayjs().add(1, 'day').startOf('day');
@@ -120,14 +119,6 @@ export default function Home() {
     .filter(b => dayjs(b.checkIn).isAfter(today) || dayjs(b.checkIn).isSame(today))
     .sort((a, b) => dayjs(a.checkIn).diff(dayjs(b.checkIn)))[0];
 
-  const checkinsThisWeek = bookings.filter(b => 
-    dayjs(b.checkIn).isBetween(startOfThisWeek, endOfThisWeek, 'day', '[]')
-  ).length;
-
-  const checkoutsThisWeek = bookings.filter(b => 
-    dayjs(b.checkOut).isBetween(startOfThisWeek, endOfThisWeek, 'day', '[]')
-  ).length;
-
   return (
     <Stack gap="lg">
       <Group justify="space-between" align="center">
@@ -139,172 +130,106 @@ export default function Home() {
 
       {isAdmin ? (
         <Stack gap="md">
-           <Grid gutter="md">
-             {/* Occupazione Mese Corrente */}
-             <Grid.Col span={{ base: 12, md: 6 }}>
-                <Card 
-                  withBorder 
-                  radius="xl" 
-                  p="lg" 
-                  shadow="md"
-                  style={glassStyles}
-                >
-                 <Group justify="space-between" wrap="nowrap">
-                   <div>
-                     <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Occupazione {currentMonth.label}</Text>
-                     <Title order={4} mb={4}>{currentMonth.occupied} / {currentMonth.total} notti</Title>
-                     <ProgressStack occupied={currentMonth.occupied} total={currentMonth.total} />
-                   </div>
-                   <RingProgress
-                     size={65}
-                     thickness={6}
-                     roundCaps
-                     sections={[{ value: currentMonth.percent, color: 'indigo' }]}
-                     label={<Text ta="center" size="xs" fw={700}>{currentMonth.percent}%</Text>}
-                   />
-                 </Group>
-               </Card>
-             </Grid.Col>
+          <Accordion variant="separated" radius="24px" multiple={true} defaultValue={[]} styles={{
+            item: { border: glassStyles.border, background: glassStyles.background, backdropFilter: glassStyles.backdropFilter, marginBottom: '12px', borderRadius: '24px' },
+            control: { padding: '20px 24px' },
+            content: { padding: '0 24px 24px 24px' }
+          }}>
+            {/* 1. Occupazione Trimestrale */}
+            <Accordion.Item value="occupazione">
+              <Accordion.Control>
+                <Stack gap={2}>
+                  <Text size="xs" fw={800} tt="uppercase" c="indigo.7" lts="1.5px">Statistiche</Text>
+                  <Title order={4} fw={900}>Occupazione Trimestrale</Title>
+                  <Text size="xs" c="dimmed" fw={600}>
+                    {currentMonth.label}, {nextMonth.label} e {followingMonth.label}
+                  </Text>
+                </Stack>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Grid gutter="md">
+                  {[currentMonth, nextMonth, followingMonth].map((m, idx) => (
+                    <Grid.Col span={{ base: 12, md: 4 }} key={idx}>
+                      <Paper withBorder p="md" radius="xl" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                        <Group justify="space-between" wrap="nowrap" mb="xs">
+                          <Text size="xs" fw={800} tt="uppercase" c="dimmed">{m.label}</Text>
+                          <Badge size="xs" variant="light" color={idx === 0 ? 'indigo' : 'blue'}>{m.percent}%</Badge>
+                        </Group>
+                        <Title order={4} mb={4}>{m.occupied} / {m.total} notti</Title>
+                        <ProgressStack occupied={m.occupied} total={m.total} color={idx === 0 ? 'indigo' : 'blue'} />
+                      </Paper>
+                    </Grid.Col>
+                  ))}
+                </Grid>
+              </Accordion.Panel>
+            </Accordion.Item>
 
-             {/* Occupazione Mese Prossimo */}
-             <Grid.Col span={{ base: 12, md: 6 }}>
-                <Card 
-                  withBorder 
-                  radius="xl" 
-                  p="lg" 
-                  shadow="md"
-                  style={glassStyles}
-                >
-                 <Group justify="space-between" wrap="nowrap">
-                   <div>
-                     <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Occupazione {nextMonth.label}</Text>
-                     <Title order={4} mb={4}>{nextMonth.occupied} / {nextMonth.total} notti</Title>
-                     <ProgressStack occupied={nextMonth.occupied} total={nextMonth.total} color="blue" />
-                   </div>
-                   <RingProgress
-                     size={65}
-                     thickness={6}
-                     roundCaps
-                     sections={[{ value: nextMonth.percent, color: 'blue' }]}
-                     label={<Text ta="center" size="xs" fw={700}>{nextMonth.percent}%</Text>}
-                   />
-                 </Group>
-               </Card>
-             </Grid.Col>
-           </Grid>
-
-            <Divider label="Tracker Settimanale Admin" labelPosition="center" color="gray.2" />
-
+            {/* 2. Inventario Biancheria */}
             {inventory && (
-              <Paper 
-                withBorder 
-                radius="xl" 
-                p="lg" 
-                shadow="md"
-                style={glassStyles}
-              >
-                <Group justify="space-between" mb="md">
-                  <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts="1px">Inventario Biancheria Pulita</Text>
-                  {(inventory.bedKits === 0 && inventory.towelKits === 0) && (
-                    <Badge color="orange" variant="light" leftSection={<IconAlertCircle size={10} />}>Configurazione richiesta</Badge>
-                  )}
-                </Group>
-                {(inventory.bedKits === 0 && inventory.towelKits === 0) ? (
-                  <Stack align="center" py="sm" gap="xs">
-                    <Text size="sm" ta="center" c="dimmed">Benvenuto! Imposta la tua disponibilità iniziale di kit puliti.</Text>
-                    <Button 
-                      variant="light" 
-                      color="indigo" 
-                      size="xs" 
-                      radius="xl"
-                      rightSection={<IconArrowRight size={14} />}
-                      onClick={() => navigate('/biancheria')}
-                    >
-                      Configura ora
-                    </Button>
+              <Accordion.Item value="biancheria">
+                <Accordion.Control>
+                  <Stack gap={2}>
+                    <Text size="xs" fw={800} tt="uppercase" c="teal.7" lts="1.5px">Operativo</Text>
+                    <Group gap="xs">
+                      <Title order={4} fw={900}>Inventario Biancheria</Title>
+                      {(inventory.bedKits === 0 && inventory.towelKits === 0) && (
+                        <Badge color="orange" size="xs">Richiesto</Badge>
+                      )}
+                    </Group>
                   </Stack>
-                ) : (
-                  <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
-                    <Group gap="md" align="center" wrap="nowrap">
-                      <ThemeIcon size={48} radius="xl" color="indigo" variant="light">
-                        <IconBed size={26} />
-                      </ThemeIcon>
-                      <div style={{ flex: 1 }}>
-                        <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts="0.5px">Kit Letto</Text>
-                        <Title order={2} c={inventory.bedKits < 0 ? 'red.6' : 'indigo.9'} style={{ lineHeight: 1 }}>
-                          {inventory.bedKits}
-                        </Title>
-                      </div>
-                    </Group>
-                    <Group gap="md" align="center" wrap="nowrap">
-                      <ThemeIcon size={48} radius="xl" color="teal" variant="light">
-                        <IconBath size={26} />
-                      </ThemeIcon>
-                      <div style={{ flex: 1 }}>
-                        <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts="0.5px">Kit Asciugamani</Text>
-                        <Title order={2} c={inventory.towelKits < 0 ? 'red.6' : 'teal.9'} style={{ lineHeight: 1 }}>
-                          {inventory.towelKits}
-                        </Title>
-                      </div>
-                    </Group>
-                  </SimpleGrid>
-                )}
-
-                
-                <Text size="10px" c="dimmed" mt="md" ta="right" fw={500}>
-                  Aggiornato: {dayjs(inventory.lastUpdated?.toDate ? inventory.lastUpdated.toDate() : inventory.lastUpdated).format('HH:mm [del] DD MMM')}
-                </Text>
-              </Paper>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  {(inventory.bedKits === 0 && inventory.towelKits === 0) ? (
+                    <Stack align="center" py="sm" gap="xs">
+                      <Text size="sm" ta="center" c="dimmed">Benvenuto! Imposta disponibilità iniziale di kit puliti.</Text>
+                      <Button variant="light" color="indigo" size="xs" radius="xl" onClick={() => navigate('/biancheria')}>
+                        Configura ora
+                      </Button>
+                    </Stack>
+                  ) : (
+                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                      <Paper withBorder p="md" radius="xl" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                        <Group gap="md">
+                          <ThemeIcon size="md" radius="xl" color="indigo" variant="light"><IconBed size={18} /></ThemeIcon>
+                          <div>
+                            <Text size="xs" c="dimmed" fw={700}>KIT LETTO</Text>
+                            <Title order={3}>{inventory.bedKits}</Title>
+                          </div>
+                        </Group>
+                      </Paper>
+                      <Paper withBorder p="md" radius="xl" style={{ background: 'rgba(0,0,0,0.02)' }}>
+                        <Group gap="md">
+                          <ThemeIcon size="md" radius="xl" color="teal" variant="light"><IconBath size={18} /></ThemeIcon>
+                          <div>
+                            <Text size="xs" c="dimmed" fw={700}>KIT ASCIUGAMANI</Text>
+                            <Title order={3}>{inventory.towelKits}</Title>
+                          </div>
+                        </Group>
+                      </Paper>
+                    </SimpleGrid>
+                  )}
+                </Accordion.Panel>
+              </Accordion.Item>
             )}
 
-           <Grid gutter="md">
-             {/* Prossimi Eventi Admin */}
-             <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Paper 
-                  withBorder 
-                  radius="xl" 
-                  p="md" 
-                  shadow="md"
-                  style={glassStyles}
-                >
-                 <Group wrap="nowrap">
-                   <ThemeIcon size="lg" radius="xl" variant="light" color="green">
-                     <IconLogin size={20} />
-                   </ThemeIcon>
-                   <div style={{ flex: 1 }}>
-                     <Text size="xs" c="dimmed" fw={800} tt="uppercase" lts="1px">Prossimo Check-in</Text>
-                     <Text size="sm" fw={800} truncate>
-                       {nextCheckin ? dayjs(nextCheckin.checkIn).format('ddd D MMM') : 'Nessuno'}
-                     </Text>
-                     <Text size="xs" c="dimmed" fw={500}>{checkinsThisWeek} previsti questa sett.</Text>
-                   </div>
-                 </Group>
-               </Paper>
-             </Grid.Col>
-
-             <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Paper 
-                  withBorder 
-                  radius="xl" 
-                  p="md" 
-                  shadow="md"
-                  style={glassStyles}
-                >
-                 <Group wrap="nowrap">
-                   <ThemeIcon size="lg" radius="xl" variant="light" color="red">
-                     <IconLogout size={20} />
-                   </ThemeIcon>
-                   <div style={{ flex: 1 }}>
-                     <Text size="xs" c="dimmed" fw={800} tt="uppercase" lts="1px">Prossimo Check-out</Text>
-                     <Text size="sm" fw={800} truncate>
-                       {nextCheckout ? dayjs(nextCheckout.checkOut).format('ddd D MMM') : 'Nessuno'}
-                     </Text>
-                     <Text size="xs" c="dimmed" fw={500}>{checkoutsThisWeek} previsti questa sett.</Text>
-                   </div>
-                 </Group>
-               </Paper>
-             </Grid.Col>
-           </Grid>
+            {/* 3. Agenda Settimanale (la stessa usata dallo staff) */}
+            <Accordion.Item value="agenda">
+              <Accordion.Control>
+                <Stack gap={2}>
+                  <Text size="xs" fw={800} tt="uppercase" c="indigo.7" lts="1.5px">Pianificazione</Text>
+                  <Group gap="xs">
+                    <Title order={4} fw={900}>Agenda Settimanale</Title>
+                    {upcomingActivityCount > 0 && (
+                      <Badge color="indigo" variant="light" size="sm">{upcomingActivityCount} attività</Badge>
+                    )}
+                  </Group>
+                </Stack>
+              </Accordion.Control>
+              <Accordion.Panel>
+                <AgendaPanel bookings={bookings} />
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
         </Stack>
       ) : (
         <Stack gap="lg">
@@ -446,7 +371,7 @@ export default function Home() {
               overflow: 'hidden'
             }}
           >
-            <Accordion variant="separated" radius="24px" styles={{
+            <Accordion variant="separated" radius="24px" defaultValue="" styles={{
               item: { border: 'none', background: 'transparent' },
               control: { padding: '20px 24px' },
               content: { padding: '0 16px 20px 16px' }
@@ -467,53 +392,7 @@ export default function Home() {
                   </Stack>
                 </Accordion.Control>
                 <Accordion.Panel>
-                  <Stack gap={6}>
-                    {Array.from({ length: 7 }).map((_, i) => {
-                      const dayDate = dayjs().add(i + 1, 'day').startOf('day');
-                      const checkIn = bookings.find(b => dayjs(b.checkIn).isSame(dayDate, 'day'));
-                      const checkOut = bookings.find(b => dayjs(b.checkOut).isSame(dayDate, 'day'));
-                      
-                      return (
-                        <Paper 
-                          key={i} 
-                          withBorder 
-                          p="sm" 
-                          radius="xl" 
-                          style={{ 
-                            background: (checkIn || checkOut) ? 'rgba(121, 80, 242, 0.05)' : 'rgba(255,255,255,0.02)',
-                            borderColor: (checkIn || checkOut) ? 'var(--mantine-color-indigo-light)' : 'rgba(0,0,0,0.03)'
-                          }}
-                        >
-                          <Group justify="space-between" wrap="nowrap">
-                            <Stack gap={0} style={{ width: 70 }}>
-                              <Text size="9px" fw={800} tt="uppercase" c="dimmed" lh={1.1}>
-                                {dayDate.format('ddd')}
-                              </Text>
-                              <Text size="sm" fw={900}>
-                                {dayDate.format('D MMM')}
-                              </Text>
-                            </Stack>
-
-                            <Group gap="xs" style={{ flex: 1, justifyContent: 'flex-end' }}>
-                              {checkOut && (
-                                <Badge color="red" variant="light" size="xs" radius="sm" leftSection={<IconLogout size={10} />}>
-                                  Check-out
-                                </Badge>
-                              )}
-                              {checkIn && (
-                                <Badge color="green" variant="light" size="xs" radius="sm" leftSection={<IconLogin size={10} />}>
-                                  Check-in
-                                </Badge>
-                              )}
-                              {!checkIn && !checkOut && (
-                                <Text size="xs" c="dimmed" fs="italic">Libero</Text>
-                              )}
-                            </Group>
-                          </Group>
-                        </Paper>
-                      );
-                    })}
-                  </Stack>
+                  <AgendaPanel bookings={bookings} />
                 </Accordion.Panel>
               </Accordion.Item>
             </Accordion>
@@ -555,6 +434,58 @@ function ProgressStack({ occupied, total, color = "indigo" }: { occupied: number
           background: `var(--mantine-color-${color}-6)` 
         }} />
       </div>
+    </Stack>
+  );
+}
+
+function AgendaPanel({ bookings }: { bookings: Booking[] }) {
+  return (
+    <Stack gap={6}>
+      {Array.from({ length: 7 }).map((_, i) => {
+        const dayDate = dayjs().add(i + 1, 'day').startOf('day');
+        const checkIn = bookings.find(b => dayjs(b.checkIn).isSame(dayDate, 'day'));
+        const checkOut = bookings.find(b => dayjs(b.checkOut).isSame(dayDate, 'day'));
+
+        return (
+          <Paper
+            key={i}
+            withBorder
+            p="sm"
+            radius="xl"
+            style={{
+              background: (checkIn || checkOut) ? 'rgba(121, 80, 242, 0.05)' : 'rgba(255,255,255,0.02)',
+              borderColor: (checkIn || checkOut) ? 'var(--mantine-color-indigo-light)' : 'rgba(0,0,0,0.03)'
+            }}
+          >
+            <Group justify="space-between" wrap="nowrap">
+              <Stack gap={0} style={{ width: 70 }}>
+                <Text size="9px" fw={800} tt="uppercase" c="dimmed" lh={1.1}>
+                  {dayDate.format('ddd')}
+                </Text>
+                <Text size="sm" fw={900}>
+                  {dayDate.format('D MMM')}
+                </Text>
+              </Stack>
+
+              <Group gap="xs" style={{ flex: 1, justifyContent: 'flex-end' }}>
+                {checkOut && (
+                  <Badge color="red" variant="light" size="xs" radius="sm" leftSection={<IconLogout size={10} />}>
+                    Check-out
+                  </Badge>
+                )}
+                {checkIn && (
+                  <Badge color="green" variant="light" size="xs" radius="sm" leftSection={<IconLogin size={10} />}>
+                    Check-in
+                  </Badge>
+                )}
+                {!checkIn && !checkOut && (
+                  <Text size="xs" c="dimmed" fs="italic">Libero</Text>
+                )}
+              </Group>
+            </Group>
+          </Paper>
+        );
+      })}
     </Stack>
   );
 }
