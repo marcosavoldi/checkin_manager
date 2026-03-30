@@ -109,3 +109,15 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Prevent auto-zoom on mobile inputs (iOS/Android) */
+@media screen and (max-width: 768px) {
+  input, 
+  select, 
+  textarea,
+  .mantine-Input-input,
+  .mantine-Select-input,
+  .mantine-Textarea-input {
+    font-size: 16px !important;
+  }
+}
