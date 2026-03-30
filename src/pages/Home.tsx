@@ -375,9 +375,15 @@ export default function Home() {
                 <div>
                   <Text size="xs" fw={700} tt="uppercase" style={{ color: 'rgba(255,255,255,0.7)', lts: '1px' }}>Prossimo Check-in</Text>
                   {nextCheckin ? (
-                    <Text fw={900} size="lg" lh={1.2}>
-                      {dayjs(nextCheckin.checkIn).format('dddd D MMMM')}
-                    </Text>
+                    <>
+                      <Text fw={900} size="lg" lh={1.2}>
+                        {dayjs(nextCheckin.checkIn).format('dddd D MMMM')}
+                      </Text>
+                      <Badge variant="filled" color="rgba(255,255,255,0.2)" size="xs" mt={4}>
+                        {nextCheckin.adults} {nextCheckin.adults === 1 ? 'Adulto' : 'Adulti'}
+                        {nextCheckin.children > 0 && ` + ${nextCheckin.children} ${nextCheckin.children === 1 ? 'Bambino' : 'Bambini'}`}
+                      </Badge>
+                    </>
                   ) : (
                     <Text fw={700}>Nessun arrivo previsto</Text>
                   )}
@@ -428,39 +434,57 @@ export default function Home() {
                 <Text size="xs" fw={800} tt="uppercase" c="violet.7" lts="1px">I Prossimi 7 giorni</Text>
                 <Title order={4} fw={900}>Panoramica Attività</Title>
                 <Text size="xs" c="dimmed" fw={600}>
-                  {today.format('D MMM')} — {today.add(7, 'day').format('D MMM')}
+                  {dayjs().add(1, 'day').format('D MMM')} — {dayjs().add(7, 'day').format('D MMM')}
                 </Text>
               </Stack>
 
-              <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm">
-                <Paper withBorder radius="lg" p="sm" style={{ background: 'var(--mantine-color-green-light)', borderColor: 'var(--mantine-color-green-2)' }}>
-                  <Group wrap="nowrap" gap="sm">
-                    <ThemeIcon size={34} radius="md" color="green" variant="filled">
-                      <IconLogin size={18} />
-                    </ThemeIcon>
-                    <div>
-                      <Text size="xs" c="green.9" fw={700} tt="uppercase">Check-in</Text>
-                      <Text fw={900} size="lg" lh={1} c="green.9">
-                        {bookings.filter(b => dayjs(b.checkIn).isBetween(today, today.add(7, 'day'), 'day', '[]')).length}
-                      </Text>
-                    </div>
-                  </Group>
-                </Paper>
+              <Stack gap={4}>
+                {Array.from({ length: 7 }).map((_, i) => {
+                  const dayDate = dayjs().add(i + 1, 'day').startOf('day');
+                  const checkIn = bookings.find(b => dayjs(b.checkIn).isSame(dayDate, 'day'));
+                  const checkOut = bookings.find(b => dayjs(b.checkOut).isSame(dayDate, 'day'));
+                  
+                  return (
+                    <Paper 
+                      key={i} 
+                      withBorder 
+                      p="xs" 
+                      radius="md" 
+                      style={{ 
+                        background: 'rgba(255,255,255,0.05)',
+                        borderColor: (checkIn || checkOut) ? 'var(--mantine-color-violet-light)' : 'rgba(0,0,0,0.05)'
+                      }}
+                    >
+                      <Group justify="space-between" wrap="nowrap">
+                        <Stack gap={0} style={{ width: 80 }}>
+                          <Text size="xs" fw={800} tt="uppercase" c="dimmed" lh={1.1}>
+                            {dayDate.format('ddd')}
+                          </Text>
+                          <Text size="sm" fw={900}>
+                            {dayDate.format('D MMM')}
+                          </Text>
+                        </Stack>
 
-                <Paper withBorder radius="lg" p="sm" style={{ background: 'var(--mantine-color-red-light)', borderColor: 'var(--mantine-color-red-2)' }}>
-                  <Group wrap="nowrap" gap="sm">
-                    <ThemeIcon size={34} radius="md" color="red" variant="filled">
-                      <IconLogout size={18} />
-                    </ThemeIcon>
-                    <div>
-                      <Text size="xs" c="red.9" fw={700} tt="uppercase">Check-out</Text>
-                      <Text fw={900} size="lg" lh={1} c="red.9">
-                        {bookings.filter(b => dayjs(b.checkOut).isBetween(today, today.add(7, 'day'), 'day', '[]')).length}
-                      </Text>
-                    </div>
-                  </Group>
-                </Paper>
-              </SimpleGrid>
+                        <Group gap="xs" style={{ flex: 1 }}>
+                          {checkOut && (
+                            <Badge color="red" variant="light" size="sm" leftSection={<IconLogout size={10} />}>
+                              Check-out
+                            </Badge>
+                          )}
+                          {checkIn && (
+                            <Badge color="green" variant="light" size="sm" leftSection={<IconLogin size={10} />}>
+                              Check-in
+                            </Badge>
+                          )}
+                          {!checkIn && !checkOut && (
+                            <Text size="xs" c="dimmed" fs="italic">Nessuna attività</Text>
+                          )}
+                        </Group>
+                      </Group>
+                    </Paper>
+                  );
+                })}
+              </Stack>
 
               <Button 
                 onClick={() => navigate('/prenotazioni')}
