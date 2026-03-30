@@ -456,7 +456,12 @@ function AgendaPanel({ bookings }: { bookings: Booking[] }) {
         const dayDate = dayjs().add(i + 1, 'day').startOf('day');
         const checkIn = bookings.find(b => dayjs(b.checkIn).isSame(dayDate, 'day'));
         const checkOut = bookings.find(b => dayjs(b.checkOut).isSame(dayDate, 'day'));
-        const hasActivity = checkIn || checkOut;
+        const isMidStay = !checkIn && !checkOut && bookings.some(b => {
+          const inDate = dayjs(b.checkIn).startOf('day');
+          const outDate = dayjs(b.checkOut).startOf('day');
+          return dayDate.isAfter(inDate) && dayDate.isBefore(outDate);
+        });
+        const hasActivity = checkIn || checkOut || isMidStay;
 
         return (
           <Paper
@@ -492,8 +497,11 @@ function AgendaPanel({ bookings }: { bookings: Booking[] }) {
                     CHECK-IN
                   </Badge>
                 )}
+                {isMidStay && (
+                  <Text size="xs" fw={800} c="indigo.6" tt="uppercase" lts="0.5px">Occupata</Text>
+                )}
                 {!hasActivity && (
-                  <Text size="xs" c="dimmed" fw={600} fs="italic">Libero</Text>
+                  <Text size="xs" c="dimmed" fw={600} fs="italic">Libera</Text>
                 )}
               </Group>
             </Group>
