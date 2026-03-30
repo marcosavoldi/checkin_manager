@@ -134,13 +134,26 @@ export default function Home() {
       {isAdmin ? (
         <Stack gap="md">
           <Accordion variant="separated" radius="24px" multiple={true} defaultValue={[]} styles={{
-            item: { border: glassStyles.border, background: glassStyles.background, backdropFilter: glassStyles.backdropFilter, marginBottom: '12px', borderRadius: '24px' },
+            item: { 
+              border: glassStyles.border, 
+              background: glassStyles.background, 
+              backdropFilter: glassStyles.backdropFilter, 
+              marginBottom: '16px', 
+              borderRadius: '24px',
+              boxShadow: glassStyles.boxShadow,
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              overflow: 'hidden'
+            },
             control: { padding: '20px 24px' },
             content: { padding: '0 24px 24px 24px' }
           }}>
             {/* 1. Occupazione Trimestrale */}
             <Accordion.Item value="occupazione">
-              <Accordion.Control>
+              <Accordion.Control icon={
+                <ThemeIcon size="lg" radius="xl" variant="gradient" gradient={{ from: 'indigo.4', to: 'indigo.7' }}>
+                  <IconLayoutGrid size={20} />
+                </ThemeIcon>
+              }>
                 <Stack gap={2}>
                   <Text size="11px" fw={900} tt="uppercase" c="indigo.6" lts="1.8px">Analisi Dati</Text>
                   <Title order={4} fw={900}>Occupazione Trimestrale</Title>
@@ -193,7 +206,11 @@ export default function Home() {
             {/* 2. Inventario Biancheria */}
             {inventory && (
               <Accordion.Item value="biancheria">
-                <Accordion.Control>
+                <Accordion.Control icon={
+                  <ThemeIcon size="lg" radius="xl" variant="gradient" gradient={{ from: 'teal.4', to: 'teal.7' }}>
+                    <IconBed size={20} />
+                  </ThemeIcon>
+                }>
                   <Stack gap={2}>
                     <Text size="11px" fw={900} tt="uppercase" c="teal.7" lts="1.8px">Operatività</Text>
                     <Group gap="xs">
@@ -240,7 +257,11 @@ export default function Home() {
 
             {/* 3. Agenda Settimanale (la stessa usata dallo staff) */}
             <Accordion.Item value="agenda">
-              <Accordion.Control>
+              <Accordion.Control icon={
+                <ThemeIcon size="lg" radius="xl" variant="gradient" gradient={{ from: 'blue.4', to: 'blue.7' }}>
+                  <IconLogin size={20} />
+                </ThemeIcon>
+              }>
                 <Stack gap={2}>
                   <Text size="11px" fw={900} tt="uppercase" c="indigo.6" lts="1.8px">Logistica</Text>
                   <Group gap="xs">
