@@ -13,7 +13,6 @@ import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, type Booking, type BookingSource } from '../services/bookingService';
 import Loader from '../components/Loader';
 import ErrorState from '../components/ErrorState';
-import BookingDetailModal from '../components/BookingDetailModal';
 import dayjs from 'dayjs';
 import 'dayjs/locale/it';
 
@@ -30,7 +29,7 @@ const SOURCE_LABELS: Record<BookingSource, string> = {
   direct: 'Diretta'
 };
 
-type BookingEventCompat = Booking;
+
 
 function getBookingsForDay(bookings: Booking[], date: Date) {
   const d = dayjs(date);
@@ -41,27 +40,37 @@ function getBookingsForDay(bookings: Booking[], date: Date) {
 
 const NOTE_THRESHOLD = 120;
 
-function StaffNote({ note, label, icon: Icon = IconNotes }: { note?: string; label: string; icon?: any }) {
+function StaffNote({ note, label, icon: Icon = IconNotes, variant = 'staff' }: { 
+  note?: string; 
+  label: string; 
+  icon?: any;
+  variant?: 'staff' | 'admin';
+}) {
   const [expanded, setExpanded] = useState(false);
   if (!note) return null;
   const isLong = note.length > NOTE_THRESHOLD;
+  
+  const colors = variant === 'admin' 
+    ? { bg: 'rgba(76, 110, 245, 0.08)', border: 'var(--mantine-color-indigo-6)', text: 'var(--mantine-color-indigo-8)' }
+    : { bg: 'rgba(255, 145, 0, 0.08)', border: '#ff9100', text: 'orange.8' };
+
   return (
     <Box
       mt={10}
       p="xs"
       style={{
-        background: 'rgba(255, 145, 0, 0.08)',
+        background: colors.bg,
         borderRadius: 12,
-        border: '1.5px solid #ff9100',
+        border: `1.5px solid ${colors.border}`,
         position: 'relative',
         overflow: 'hidden'
       }}
     >
       <Group gap={6} mb={4}>
-        <ThemeIcon variant="transparent" color="orange.8" size="sm">
+        <ThemeIcon variant="transparent" color={colors.text} size="sm">
           <Icon size={12} stroke={2.5} />
         </ThemeIcon>
-        <Text size="10px" fw={900} c="orange.8" tt="uppercase" style={{ letterSpacing: 1 }}>
+        <Text size="10px" fw={900} c={colors.text} tt="uppercase" style={{ letterSpacing: 1 }}>
           {label}
         </Text>
       </Group>
@@ -72,7 +81,7 @@ function StaffNote({ note, label, icon: Icon = IconNotes }: { note?: string; lab
           </Collapse>
           {!expanded && <Text size="sm" fw={700} c="var(--mantine-color-text)" lineClamp={2} style={{ lineHeight: 1.4 }}>{note}</Text>}
           <Button
-            size="compact-xs" variant="subtle" color="orange" mt={4} p={0}
+            size="compact-xs" variant="subtle" color={variant === 'admin' ? 'indigo' : 'orange'} mt={4} p={0}
             rightSection={expanded ? <IconChevronUp size={10} /> : <IconChevronDown size={10} />}
             onClick={() => setExpanded(e => !e)}
             style={{ height: 'auto' }}
@@ -93,7 +102,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<string>('cards');
-  const [selectedBooking, setSelectedBooking] = useState<BookingEventCompat | null>(null);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [dayModalOpened, { open: openDayModal, close: closeDayModal }] = useDisclosure(false);
   const [filter, setFilter] = useState<'future' | 'past' | 'all'>('future');
@@ -279,27 +287,13 @@ export default function Dashboard() {
                     </Paper>
                   </Group>
 
-                  {/* Row 4: Staff notes */}
+                  {/* Row 4: All notes */}
                   <Stack gap={0}>
                     <StaffNote note={b.staffNoteCheckIn} label="Nota Check-in" icon={IconLogin} />
                     <StaffNote note={b.staffNoteCheckOut} label="Nota Check-out" icon={IconLogout} />
                     <StaffNote note={b.staffNoteBooking} label="Nota Prenotazione" />
+                    {isAdmin && <StaffNote note={b.adminNote} label="Nota Admin" variant="admin" />}
                   </Stack>
-
-                  {/* Row 5: CTA button (Admin ONLY) */}
-                  {isAdmin && (
-                    <Button
-                      fullWidth
-                      size="xs"
-                      variant="light"
-                      color="indigo"
-                      mt="md"
-                      radius="md"
-                      onClick={() => setSelectedBooking(b)}
-                    >
-                      Note & Dettagli
-                    </Button>
-                  )}
                 </Card>
               </Grid.Col>
             ))}
@@ -429,26 +423,13 @@ export default function Dashboard() {
                   <StaffNote note={b.staffNoteCheckIn} label="Nota Check-in" icon={IconLogin} />
                   <StaffNote note={b.staffNoteCheckOut} label="Nota Check-out" icon={IconLogout} />
                   <StaffNote note={b.staffNoteBooking} label="Nota Prenotazione" />
+                  {isAdmin && <StaffNote note={b.adminNote} label="Nota Admin" variant="admin" />}
                 </Stack>
-
-                <Button
-                  fullWidth mt="sm" size="xs" variant="light" color="indigo" radius="md"
-                  onClick={() => { closeDayModal(); setSelectedBooking(b); }}
-                >
-                  Note & Dettagli
-                </Button>
               </Paper>
             );
           })}
         </Stack>
       </Modal>
-
-      {/* ── Modale note prenotazione ───────────── */}
-      <BookingDetailModal
-        opened={!!selectedBooking}
-        onClose={() => setSelectedBooking(null)}
-        booking={selectedBooking}
-      />
     </Box>
   );
 }
