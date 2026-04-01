@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
 import {
   Title, Button, Group, Stack, Text, Card, Badge,
   Modal, TextInput, Textarea, Select, ActionIcon,
-  Box, Divider, Paper, NumberInput, SegmentedControl, Center, Affix
+  Box, Divider, Paper, NumberInput, SegmentedControl, Center, Affix, Collapse
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { DateValue } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit, IconTrash, IconCalendarPlus, IconPlus } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconCalendarPlus, IconPlus, IconSearch, IconFilter, IconX } from '@tabler/icons-react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, addBooking, updateBooking, deleteBooking, type Booking, type BookingSource } from '../services/bookingService';
 import dayjs from 'dayjs';
@@ -49,15 +49,50 @@ export default function ManageBookings() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [opened, { open, close }] = useDisclosure(false);
   const [filter, setFilter] = useState<'future' | 'past' | 'all'>('future');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);
   
   const today = dayjs().startOf('day');
 
-  const filteredBookings = bookings.filter(b => {
-    const checkOut = dayjs(b.checkOut);
-    if (filter === 'future') return checkOut.isSame(today, 'day') || checkOut.isAfter(today);
-    if (filter === 'past') return checkOut.isBefore(today);
-    return true;
-  });
+  const filteredBookings = useMemo(() => {
+    return bookings.filter(b => {
+      // 1. Filtro Segmentato (Future/Past/All)
+      const checkOutDate = dayjs(b.checkOut);
+      let matchSegment = true;
+      if (filter === 'future') matchSegment = checkOutDate.isSame(today, 'day') || checkOutDate.isAfter(today);
+      else if (filter === 'past') matchSegment = checkOutDate.isBefore(today);
+
+      if (!matchSegment) return false;
+
+      // 2. Filtro Testo (Nome + Note)
+      const searchLower = searchQuery.toLowerCase().trim();
+      if (searchLower) {
+        const matchText = 
+          (b.guestName || '').toLowerCase().includes(searchLower) ||
+          (b.staffNoteCheckIn || '').toLowerCase().includes(searchLower) ||
+          (b.staffNoteCheckOut || '').toLowerCase().includes(searchLower) ||
+          (b.staffNoteBooking || '').toLowerCase().includes(searchLower) ||
+          (b.adminNote || '').toLowerCase().includes(searchLower);
+        if (!matchText) return false;
+      }
+
+      // 3. Filtro Date (Check-in o Check-out nel range)
+      if (dateRange[0] && dateRange[1]) {
+        const start = dayjs(dateRange[0]).startOf('day');
+        const end = dayjs(dateRange[1]).endOf('day');
+        const cIn = dayjs(b.checkIn).startOf('day');
+        const cOut = dayjs(b.checkOut).startOf('day');
+        
+        const inRange = (cIn.isAfter(start) || cIn.isSame(start)) && (cIn.isBefore(end) || cIn.isSame(end));
+        const outRange = (cOut.isAfter(start) || cOut.isSame(start)) && (cOut.isBefore(end) || cOut.isSame(end));
+        
+        if (!inRange && !outRange) return false;
+      }
+
+      return true;
+    });
+  }, [bookings, filter, searchQuery, dateRange, today]);
 
   const load = async () => {
     setLoading(true);
@@ -147,21 +182,81 @@ export default function ManageBookings() {
         </ActionIcon>
       </Affix>
 
-      <Center mb="lg">
-        <SegmentedControl
-          value={filter}
-          onChange={(v: any) => setFilter(v)}
-          radius="xl"
-          size="sm"
-          transitionDuration={200}
-          color="indigo"
-          data={[
-            { label: 'Prossime', value: 'future' },
-            { label: 'Passate', value: 'past' },
-            { label: 'Tutte', value: 'all' },
-          ]}
-        />
-      </Center>
+      <Stack gap="md" mb="xl">
+        <Group gap="xs" wrap="nowrap">
+          <TextInput
+            placeholder="Cerca per nome o nelle note..."
+            leftSection={<IconSearch size={16} />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.currentTarget.value)}
+            style={{ flex: 1 }}
+            radius="md"
+            rightSection={searchQuery ? (
+              <ActionIcon variant="transparent" color="gray" onClick={() => setSearchQuery('')}>
+                <IconX size={14} />
+              </ActionIcon>
+            ) : null}
+          />
+          <ActionIcon 
+            variant={filtersOpened ? 'filled' : 'light'} 
+            color="indigo" 
+            size="lg" 
+            radius="md" 
+            onClick={toggleFilters}
+          >
+            <IconFilter size={20} />
+          </ActionIcon>
+        </Group>
+
+        <Collapse in={filtersOpened}>
+          <Paper withBorder p="md" radius="md" style={{ background: 'var(--mantine-color-gray-0)' }}>
+            <Stack gap="sm">
+              <Text size="xs" fw={700} c="dimmed" tt="uppercase" lts="0.5px">Filtri Avanzati</Text>
+              <Group grow align="flex-end">
+                <DatePickerInput
+                  type="range"
+                  label="Periodo (Check-in o Out)"
+                  placeholder="Seleziona intervallo"
+                  value={dateRange}
+                  onChange={(val) => setDateRange(val as [Date | null, Date | null])}
+                  locale="it"
+                  clearable
+                  radius="md"
+                />
+                <Button 
+                  variant="subtle" 
+                  color="gray" 
+                  size="sm" 
+                  leftSection={<IconX size={14} />}
+                  onClick={() => {
+                    setSearchQuery('');
+                    setDateRange([null, null]);
+                  }}
+                  disabled={!searchQuery && !dateRange[0]}
+                >
+                  Reset
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        </Collapse>
+
+        <Center>
+          <SegmentedControl
+            value={filter}
+            onChange={(v: any) => setFilter(v)}
+            radius="xl"
+            size="sm"
+            transitionDuration={200}
+            color="indigo"
+            data={[
+              { label: 'Prossime', value: 'future' },
+              { label: 'Passate', value: 'past' },
+              { label: 'Tutte', value: 'all' },
+            ]}
+          />
+        </Center>
+      </Stack>
 
       {loading ? (
         <Text c="dimmed" ta="center" py="xl">Caricamento...</Text>

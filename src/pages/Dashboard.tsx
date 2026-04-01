@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
 import {
   Title, Text, Button, Grid, Card, Badge, Group, Stack,
-  Tabs, Modal, Box, ThemeIcon, Avatar, Paper, Collapse, Divider, SegmentedControl, Center
+  Tabs, Modal, Box, ThemeIcon, Avatar, Paper, Collapse, Divider, SegmentedControl, Center, TextInput, ActionIcon
 } from '@mantine/core';
-import { Calendar } from '@mantine/dates';
+import { Calendar, DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconCalendar, IconLayoutGrid, IconLogin, IconLogout,
-  IconArrowRight, IconUsers, IconChevronDown, IconChevronUp, IconNotes
+  IconArrowRight, IconUsers, IconChevronDown, IconChevronUp, IconNotes,
+  IconSearch, IconFilter, IconX
 } from '@tabler/icons-react';
+import { useMemo, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, type Booking, type BookingSource } from '../services/bookingService';
 import Loader from '../components/Loader';
@@ -105,6 +106,9 @@ export default function Dashboard() {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [dayModalOpened, { open: openDayModal, close: closeDayModal }] = useDisclosure(false);
   const [filter, setFilter] = useState<'future' | 'past' | 'all'>('future');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -125,18 +129,49 @@ export default function Dashboard() {
   if (error) return <ErrorState message={error} onRetry={loadData} />;
 
   const isAdmin = user?.appRole === 'admin';
-  
   const today = dayjs().startOf('day');
   
   // Per lo staff, mostriamo solo il futuro a prescindere dal filtro impostato
   const activeFilter = isAdmin ? filter : 'future';
 
-  const filteredBookings = bookings.filter(b => {
-    const checkOut = dayjs(b.checkOut);
-    if (activeFilter === 'future') return checkOut.isSame(today, 'day') || checkOut.isAfter(today);
-    if (activeFilter === 'past') return checkOut.isBefore(today);
-    return true;
-  });
+  const filteredBookings = useMemo(() => {
+    return bookings.filter(b => {
+      // 1. Segment Filter (Future/Past/All)
+      const checkOutDate = dayjs(b.checkOut);
+      let matchSegment = true;
+      if (activeFilter === 'future') matchSegment = checkOutDate.isSame(today, 'day') || checkOutDate.isAfter(today);
+      else if (activeFilter === 'past') matchSegment = checkOutDate.isBefore(today);
+      
+      if (!matchSegment) return false;
+
+      // 2. Search Text (Name + All Notes)
+      const searchLower = searchQuery.toLowerCase().trim();
+      if (searchLower) {
+        const matchText = 
+          (b.guestName || '').toLowerCase().includes(searchLower) ||
+          (b.staffNoteCheckIn || '').toLowerCase().includes(searchLower) ||
+          (b.staffNoteCheckOut || '').toLowerCase().includes(searchLower) ||
+          (b.staffNoteBooking || '').toLowerCase().includes(searchLower) ||
+          (b.adminNote || '').toLowerCase().includes(searchLower);
+        if (!matchText) return false;
+      }
+
+      // 3. Date Range (Check-in or Check-out in range)
+      if (dateRange[0] && dateRange[1]) {
+        const start = dayjs(dateRange[0]).startOf('day');
+        const end = dayjs(dateRange[1]).endOf('day');
+        const cIn = dayjs(b.checkIn).startOf('day');
+        const cOut = dayjs(b.checkOut).startOf('day');
+        
+        const inRange = (cIn.isAfter(start) || cIn.isSame(start)) && (cIn.isBefore(end) || cIn.isSame(end));
+        const outRange = (cOut.isAfter(start) || cOut.isSame(start)) && (cOut.isBefore(end) || cOut.isSame(end));
+        
+        if (!inRange && !outRange) return false;
+      }
+
+      return true;
+    });
+  }, [bookings, activeFilter, searchQuery, dateRange, today]);
 
   const dayBookings = selectedDay ? getBookingsForDay(bookings, selectedDay) : [];
 
@@ -177,6 +212,65 @@ export default function Dashboard() {
           Esci
         </Button>
       </Group>
+
+      {/* ── Search & Filters ───────────────────── */}
+      <Stack gap="xs" mb="md">
+        <Group gap="xs" wrap="nowrap">
+          <TextInput
+            placeholder="Cerca nome o nelle note..."
+            leftSection={<IconSearch size={16} />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.currentTarget.value)}
+            style={{ flex: 1 }}
+            radius="md"
+            rightSection={searchQuery ? (
+              <ActionIcon variant="transparent" color="gray" onClick={() => setSearchQuery('')}>
+                <IconX size={14} />
+              </ActionIcon>
+            ) : null}
+          />
+          <ActionIcon 
+            variant={filtersOpened ? 'filled' : 'light'} 
+            color="indigo" 
+            size="lg" 
+            radius="md" 
+            onClick={toggleFilters}
+          >
+            <IconFilter size={20} />
+          </ActionIcon>
+        </Group>
+
+        <Collapse in={filtersOpened}>
+          <Paper withBorder p="sm" radius="md" style={{ background: 'var(--mantine-color-gray-0)' }}>
+            <Group grow align="flex-end">
+              <DatePickerInput
+                type="range"
+                label="Filtro Periodo"
+                placeholder="Check-in/out in..."
+                value={dateRange}
+                onChange={(val) => setDateRange(val as [Date | null, Date | null])}
+                locale="it"
+                clearable
+                radius="md"
+                size="xs"
+              />
+              <Button 
+                variant="subtle" 
+                color="gray" 
+                size="xs" 
+                leftSection={<IconX size={14} />}
+                onClick={() => {
+                  setSearchQuery('');
+                  setDateRange([null, null]);
+                }}
+                disabled={!searchQuery && !dateRange[0]}
+              >
+                Reset
+              </Button>
+            </Group>
+          </Paper>
+        </Collapse>
+      </Stack>
 
       {/* ── Tab switcher ───────────────────────── */}
       <Tabs value={view} onChange={v => setView(v ?? 'cards')} mb="md">
