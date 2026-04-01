@@ -1,6 +1,7 @@
 import {
   Title, Text, Button, Grid, Card, Badge, Group, Stack,
-  Tabs, Modal, Box, ThemeIcon, Avatar, Paper, Collapse, Divider, SegmentedControl, Center, TextInput, ActionIcon
+  Tabs, Modal, Box, ThemeIcon, Avatar, Paper, Collapse, Divider, SegmentedControl, Center, TextInput, ActionIcon,
+  useComputedColorScheme, SimpleGrid
 } from '@mantine/core';
 import { Calendar, DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
@@ -109,7 +110,17 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
+  const glassStyles = {
+    background: computedColorScheme === 'dark' ? 'rgba(30, 31, 37, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'blur(16px)',
+    border: computedColorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.4)',
+    boxShadow: computedColorScheme === 'dark' 
+      ? '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 0 1px rgba(255, 255, 255, 0.05)'
+      : '0 8px 32px 0 rgba(31, 38, 135, 0.07), inset 0 0 0 1px rgba(255, 255, 255, 0.5)',
+  };
+  
   const loadData = async () => {
     setLoading(true);
     setError(null);
@@ -241,33 +252,54 @@ export default function Dashboard() {
         </Group>
 
         <Collapse in={filtersOpened}>
-          <Paper withBorder p="sm" radius="md" style={{ background: 'var(--mantine-color-gray-0)' }}>
-            <Group grow align="flex-end">
-              <DatePickerInput
-                type="range"
-                label="Filtro Periodo"
-                placeholder="Check-in/out in..."
-                value={dateRange}
-                onChange={(val) => setDateRange(val as [Date | null, Date | null])}
-                locale="it"
-                clearable
-                radius="md"
-                size="xs"
-              />
-              <Button 
-                variant="subtle" 
-                color="gray" 
-                size="xs" 
-                leftSection={<IconX size={14} />}
-                onClick={() => {
-                  setSearchQuery('');
-                  setDateRange([null, null]);
-                }}
-                disabled={!searchQuery && !dateRange[0]}
-              >
-                Reset
-              </Button>
-            </Group>
+          <Paper 
+            p="md" 
+            radius="24px" 
+            style={{ 
+              background: glassStyles.background,
+              backdropFilter: glassStyles.backdropFilter,
+              border: glassStyles.border,
+              boxShadow: glassStyles.boxShadow,
+              marginBottom: '16px'
+            }}
+          >
+            <Stack gap="md">
+              <Text size="xs" fw={900} tt="uppercase" c="indigo.6" lts="1.5px">Opzioni Filtro</Text>
+              
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                <DatePickerInput
+                  type="range"
+                  label="Filtro Periodo"
+                  placeholder="Seleziona date..."
+                  value={dateRange}
+                  onChange={(val) => setDateRange(val as [Date | null, Date | null])}
+                  locale="it"
+                  clearable
+                  radius="md"
+                  size="sm"
+                  styles={{ input: { height: '42px', fontWeight: 600 } }}
+                />
+                
+                <Stack gap={0} justify="flex-end">
+                  <Text size="xs" fw={700} c="transparent" mb={3}>.</Text>
+                  <Button 
+                    variant="light" 
+                    color="gray" 
+                    radius="md"
+                    size="sm" 
+                    h="42px"
+                    leftSection={<IconX size={16} />}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setDateRange([null, null]);
+                    }}
+                    disabled={!searchQuery && !dateRange[0]}
+                  >
+                    Resetta Filtri
+                  </Button>
+                </Stack>
+              </SimpleGrid>
+            </Stack>
           </Paper>
         </Collapse>
       </Stack>
