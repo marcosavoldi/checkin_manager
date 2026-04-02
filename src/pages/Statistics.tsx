@@ -48,8 +48,8 @@ export default function Statistics() {
 
     // Filtriamo le prenotazioni che hanno almeno un giorno nel periodo
     const periodBookings = bookings.filter(b => {
-      const bIn = dayjs(b.checkIn);
-      const bOut = dayjs(b.checkOut);
+      const bIn = dayjs(b.checkIn).startOf('day');
+      const bOut = dayjs(b.checkOut).startOf('day');
       return (bIn.isBefore(end) || bIn.isSame(end)) && (bOut.isAfter(start) || bOut.isSame(start));
     });
 
@@ -60,8 +60,8 @@ export default function Statistics() {
     let counts = { airbnb: 0, booking: 0, direct: 0 };
 
     periodBookings.forEach(b => {
-      const bIn = dayjs(b.checkIn);
-      const bOut = dayjs(b.checkOut);
+      const bIn = dayjs(b.checkIn).startOf('day');
+      const bOut = dayjs(b.checkOut).startOf('day');
       
       // Calcoliamo solo i giorni che cadono nel periodo selezionato
       const overlapStart = start.isAfter(bIn) ? start : bIn;

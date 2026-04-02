@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'appicon.png'],
+      includeAssets: ['favicon.svg', 'appicon.png', 'logo_black.png', 'logo_white.png'],
       manifest: {
         name: 'Lazzaretto City Walk',
         short_name: 'LCW',

@@ -10,7 +10,51 @@
     <link rel="apple-touch-icon" href="/appicon.png" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        .initial-loader-wrapper {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          width: 100vw;
+          background-color: #ffffff;
+        }
+        @media (prefers-color-scheme: dark) {
+          .initial-loader-wrapper {
+            background-color: #1a1b1e;
+          }
+        }
+        .lds-ring {
+          display: inline-block;
+          position: relative;
+          width: 40px;
+          height: 40px;
+        }
+        .lds-ring div {
+          box-sizing: border-box;
+          display: block;
+          position: absolute;
+          width: 32px;
+          height: 32px;
+          margin: 4px;
+          border: 3px solid #7950f2;
+          border-radius: 50%;
+          animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+          border-color: #7950f2 transparent transparent transparent;
+        }
+        .lds-ring div:nth-child(1) { animation-delay: -0.45s; }
+        .lds-ring div:nth-child(2) { animation-delay: -0.3s; }
+        .lds-ring div:nth-child(3) { animation-delay: -0.15s; }
+        @keyframes lds-ring {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+      <div class="initial-loader-wrapper">
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
