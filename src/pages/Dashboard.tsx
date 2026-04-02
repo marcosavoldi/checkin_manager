@@ -136,9 +136,6 @@ export default function Dashboard() {
 
   useEffect(() => { loadData(); }, []);
 
-  if (loading) return <Loader message="Caricamento prenotazioni..." />;
-  if (error) return <ErrorState message={error} onRetry={loadData} />;
-
   const isAdmin = user?.appRole === 'admin';
   const today = dayjs().startOf('day');
   
@@ -183,6 +180,9 @@ export default function Dashboard() {
       return true;
     });
   }, [bookings, activeFilter, searchQuery, dateRange, today]);
+
+  if (loading) return <Loader message="Caricamento prenotazioni..." />;
+  if (error) return <ErrorState message={error} onRetry={loadData} />;
 
   const dayBookings = selectedDay ? getBookingsForDay(bookings, selectedDay) : [];
 
