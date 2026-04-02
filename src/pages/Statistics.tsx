@@ -55,7 +55,7 @@ export default function Statistics() {
 
     let totalNights = 0;
     let totalRevenue = 0;
-    let adultsDistribution: Record<number, number> = {};
+    let guestsDistribution: Record<string, number> = {};
     let counts = { airbnb: 0, booking: 0, direct: 0 };
 
     periodBookings.forEach(b => {
@@ -71,8 +71,12 @@ export default function Statistics() {
       if (b.price) totalRevenue += b.price;
       
       const aCount = b.adults || 0;
-      if (!adultsDistribution[aCount]) adultsDistribution[aCount] = 0;
-      adultsDistribution[aCount] += nights;
+      const cCount = b.children || 0;
+      let label = `${aCount} Adult${aCount === 1 ? 'o' : 'i'}`;
+      if (cCount > 0) label += ` + ${cCount} Bambin${cCount === 1 ? 'o' : 'i'}`;
+      
+      if (!guestsDistribution[label]) guestsDistribution[label] = 0;
+      guestsDistribution[label] += nights;
 
       counts[b.source as keyof typeof counts]++;
     });
@@ -80,20 +84,20 @@ export default function Statistics() {
     const occupancyRate = (totalNights / daysInPeriod) * 100;
     const avgStay = periodBookings.length > 0 ? totalNights / periodBookings.length : 0;
     
-    const adultsBreakdown = Object.entries(adultsDistribution)
-      .map(([k, count]) => ({ 
-          adults: Number(k), 
+    const guestsBreakdown = Object.entries(guestsDistribution)
+      .map(([label, count]) => ({ 
+          label, 
           perc: totalNights > 0 ? (count / totalNights) * 100 : 0 
       }))
       .sort((a, b) => b.perc - a.perc)
-      .slice(0, 3);
+      .slice(0, 4);
 
     return {
       totalNights,
       totalRevenue,
       occupancyRate,
       avgStay,
-      adultsBreakdown,
+      guestsBreakdown,
       counts,
       totalBookings: periodBookings.length
     };
@@ -161,13 +165,13 @@ export default function Statistics() {
                   </ThemeIcon>
                 </Group>
                 <Text size="xs" c="dimmed" fw={700} tt="uppercase" mb={4}>Ospiti (Notti %)</Text>
-                {stats.adultsBreakdown.map((item, idx) => (
+                {stats.guestsBreakdown.map((item, idx) => (
                   <Group key={idx} justify="space-between" my={2}>
                     <Text size="sm" fw={800} c="orange.7">{Math.round(item.perc)}%</Text>
-                    <Text size="sm" c="dimmed" fw={600}>{item.adults} Adult{item.adults === 1 ? 'o' : 'i'}</Text>
+                    <Text size="xs" c="dimmed" fw={600}>{item.label}</Text>
                   </Group>
                 ))}
-                {stats.adultsBreakdown.length === 0 && <Text size="sm" c="dimmed" mt={4}>- Nessun dato -</Text>}
+                {stats.guestsBreakdown.length === 0 && <Text size="sm" c="dimmed" mt={4}>- Nessun dato -</Text>}
               </Stack>
             </Paper>
 
