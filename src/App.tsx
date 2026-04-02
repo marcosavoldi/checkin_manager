@@ -1,4 +1,4 @@
-import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip, Text } from '@mantine/core';
+import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip, Text, Box } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconBed, IconUsers, IconLogout, IconChartPie } from '@tabler/icons-react';
@@ -10,10 +10,11 @@ import Home from './pages/Home';
 import LinenManagement from './pages/LinenManagement';
 import StaffManagement from './pages/StaffManagement';
 import Statistics from './pages/Statistics';
+import Loader from './components/Loader';
 
 function ProtectedRoute({ children, adminOnly }: { children: React.ReactNode, adminOnly?: boolean }) {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <Box h="100vh" pt="20vh"><Loader message="Avvio Lazzaretto City Walk..." /></Box>;
   if (!user) return <Login />;
   if (adminOnly && user.appRole !== 'admin') {
     return <Navigate to="/home" />;
