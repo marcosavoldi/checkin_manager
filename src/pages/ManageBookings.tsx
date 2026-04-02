@@ -139,7 +139,7 @@ export default function ManageBookings() {
     const checkIn = form.checkIn instanceof Date ? form.checkIn : new Date(form.checkIn);
     const checkOut = form.checkOut instanceof Date ? form.checkOut : new Date(form.checkOut);
     try {
-      const payload = {
+      const payload: any = {
         checkIn, checkOut, source: form.source,
         guestName: form.guestName,
         staffNoteCheckIn: form.staffNoteCheckIn,
@@ -147,13 +147,24 @@ export default function ManageBookings() {
         staffNoteBooking: form.staffNoteBooking,
         adminNote: form.adminNote,
         adults: form.adults,
-        children: form.children,
-        price: form.price
+        children: form.children
       };
+      
+      // Firestore refuses 'undefined', we must use null if it's empty
+      if (form.price !== undefined && form.price !== null) {
+        payload.price = form.price;
+      } else {
+        payload.price = null;
+      }
+
       if (editingId) await updateBooking(editingId, payload);
       else await addBooking(payload, user!.uid);
+      
       close();
       await load();
+    } catch (err) {
+      console.error("Errore durante il salvataggio:", err);
+      alert("Si è verificato un errore durante il salvataggio. Riprova.");
     } finally {
       setSaving(false);
     }

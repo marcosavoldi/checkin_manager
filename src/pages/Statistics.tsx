@@ -55,8 +55,7 @@ export default function Statistics() {
 
     let totalNights = 0;
     let totalRevenue = 0;
-    let totalAdults = 0;
-    let totalChildren = 0;
+    let adultsDistribution: Record<number, number> = {};
     let counts = { airbnb: 0, booking: 0, direct: 0 };
 
     periodBookings.forEach(b => {
@@ -70,23 +69,31 @@ export default function Statistics() {
       
       totalNights += nights;
       if (b.price) totalRevenue += b.price;
-      totalAdults += b.adults || 0;
-      totalChildren += b.children || 0;
+      
+      const aCount = b.adults || 0;
+      if (!adultsDistribution[aCount]) adultsDistribution[aCount] = 0;
+      adultsDistribution[aCount] += nights;
+
       counts[b.source as keyof typeof counts]++;
     });
 
     const occupancyRate = (totalNights / daysInPeriod) * 100;
     const avgStay = periodBookings.length > 0 ? totalNights / periodBookings.length : 0;
-    const avgGuests = periodBookings.length > 0 ? (totalAdults + totalChildren) / periodBookings.length : 0;
+    
+    const adultsBreakdown = Object.entries(adultsDistribution)
+      .map(([k, count]) => ({ 
+          adults: Number(k), 
+          perc: totalNights > 0 ? (count / totalNights) * 100 : 0 
+      }))
+      .sort((a, b) => b.perc - a.perc)
+      .slice(0, 3);
 
     return {
       totalNights,
       totalRevenue,
       occupancyRate,
       avgStay,
-      avgGuests,
-      adultsAvg: periodBookings.length > 0 ? totalAdults / periodBookings.length : 0,
-      childrenAvg: periodBookings.length > 0 ? totalChildren / periodBookings.length : 0,
+      adultsBreakdown,
       counts,
       totalBookings: periodBookings.length
     };
@@ -97,7 +104,7 @@ export default function Statistics() {
   return (
     <Stack gap="xl">
       <Box>
-        <Title order={2} fw={800} lts="-0.5px">Statistiche Dashboard</Title>
+        <Title order={2} fw={800} lts="-0.5px" c={computedColorScheme === 'dark' ? 'white' : 'dark'}>Statistiche Dashboard</Title>
         <Text c="dimmed" size="sm">Analisi delle performance e dell'occupazione.</Text>
       </Box>
 
@@ -153,9 +160,14 @@ export default function Statistics() {
                     <IconUsers size={20} />
                   </ThemeIcon>
                 </Group>
-                <Text size="xs" c="dimmed" fw={700} tt="uppercase">Ospiti Medi</Text>
-                <Title order={3} fw={900}>{stats.avgGuests.toFixed(1)} Persone</Title>
-                <Text size="xs" c="dimmed">{stats.adultsAvg.toFixed(1)} Ad. / {stats.childrenAvg.toFixed(1)} Bam.</Text>
+                <Text size="xs" c="dimmed" fw={700} tt="uppercase" mb={4}>Ospiti (Notti %)</Text>
+                {stats.adultsBreakdown.map((item, idx) => (
+                  <Group key={idx} justify="space-between" my={2}>
+                    <Text size="sm" fw={800} c="orange.7">{Math.round(item.perc)}%</Text>
+                    <Text size="sm" c="dimmed" fw={600}>{item.adults} Adult{item.adults === 1 ? 'o' : 'i'}</Text>
+                  </Group>
+                ))}
+                {stats.adultsBreakdown.length === 0 && <Text size="sm" c="dimmed" mt={4}>- Nessun dato -</Text>}
               </Stack>
             </Paper>
 
@@ -175,7 +187,7 @@ export default function Statistics() {
           {/* Sezione Anelli Apple Style */}
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
             <Paper p="xl" radius="32px" style={glassStyles}>
-              <Title order={4} mb="xl" fw={800}>Occupazione e Target</Title>
+              <Title order={4} mb="xl" fw={800}>Tasso di Occupazione</Title>
               <Center py="xl">
                 <Box style={{ position: 'relative' }}>
                   <RingProgress
