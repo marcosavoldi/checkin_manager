@@ -1,7 +1,7 @@
 import { AppShell, Burger, Group, Container, NavLink, Image, ActionIcon, useMantineColorScheme, useComputedColorScheme, Tooltip, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconBed, IconUsers, IconLogout } from '@tabler/icons-react';
+import { IconLayoutDashboard, IconCalendarPlus, IconSun, IconMoon, IconHome, IconBed, IconUsers, IconLogout, IconChartPie } from '@tabler/icons-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -9,6 +9,7 @@ import ManageBookings from './pages/ManageBookings';
 import Home from './pages/Home';
 import LinenManagement from './pages/LinenManagement';
 import StaffManagement from './pages/StaffManagement';
+import Statistics from './pages/Statistics';
 
 function ProtectedRoute({ children, adminOnly }: { children: React.ReactNode, adminOnly?: boolean }) {
   const { user, loading } = useAuth();
@@ -36,6 +37,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     ...(user.appRole === 'admin'
       ? [
           { label: 'Gestione Prenotazioni', icon: <IconCalendarPlus size={16} />, path: '/gestione' },
+          { label: 'Statistiche', icon: <IconChartPie size={16} />, path: '/statistiche' },
           { label: 'Gestione Biancheria', icon: <IconBed size={16} />, path: '/biancheria' },
           { label: 'Gestione Staff', icon: <IconUsers size={16} />, path: '/staff' }
         ]
@@ -145,6 +147,7 @@ export default function App() {
                 <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                 <Route path="/prenotazioni" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/gestione" element={<ProtectedRoute adminOnly><ManageBookings /></ProtectedRoute>} />
+                <Route path="/statistiche" element={<ProtectedRoute adminOnly><Statistics /></ProtectedRoute>} />
                 <Route path="/biancheria" element={<ProtectedRoute adminOnly><LinenManagement /></ProtectedRoute>} />
                 <Route path="/staff" element={<ProtectedRoute adminOnly><StaffManagement /></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/" />} />

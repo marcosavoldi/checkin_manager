@@ -38,7 +38,8 @@ const EMPTY_FORM = {
   staffNoteBooking: '',
   adminNote: '',
   adults: 2,
-  children: 0
+  children: 0,
+  price: undefined as number | undefined
 };
 
 export default function ManageBookings() {
@@ -126,7 +127,8 @@ export default function ManageBookings() {
       staffNoteBooking: b.staffNoteBooking || '',
       adminNote: b.adminNote || '',
       adults: b.adults || 0,
-      children: b.children || 0
+      children: b.children || 0,
+      price: b.price
     });
     open();
   };
@@ -145,7 +147,8 @@ export default function ManageBookings() {
         staffNoteBooking: form.staffNoteBooking,
         adminNote: form.adminNote,
         adults: form.adults,
-        children: form.children
+        children: form.children,
+        price: form.price
       };
       if (editingId) await updateBooking(editingId, payload);
       else await addBooking(payload, user!.uid);
@@ -320,6 +323,11 @@ export default function ManageBookings() {
                         {b.adults} {b.adults === 1 ? 'Adulto' : 'Adulti'}
                         {b.children > 0 && ` + ${b.children} ${b.children === 1 ? 'Bambino' : 'Bambini'}`}
                       </Text>
+                      {user?.appRole === 'admin' && b.price !== undefined && (
+                        <Text size="xs" fw={800} c="teal.7">
+                          € {b.price.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                        </Text>
+                      )}
                     </Stack>
 
                     <Group gap={4}>
@@ -446,15 +454,30 @@ export default function ManageBookings() {
               label="Adulti"
               min={1}
               value={form.adults}
-              onChange={(v: string | number) => setForm(f => ({ ...f, adults: Number(v) || 0 }))}
+              onChange={(v) => setForm(f => ({ ...f, adults: Number(v) || 0 }))}
             />
             <NumberInput
               label="Bambini"
               min={0}
               value={form.children}
-              onChange={(v: string | number) => setForm(f => ({ ...f, children: Number(v) || 0 }))}
+              onChange={(v) => setForm(f => ({ ...f, children: Number(v) || 0 }))}
             />
           </Group>
+
+          {user?.appRole === 'admin' && (
+            <NumberInput
+              label="Importo Prenotazione"
+              placeholder="es. 150"
+              prefix="€ "
+              decimalScale={2}
+              fixedDecimalScale
+              value={form.price}
+              onChange={(v) => setForm(f => ({ ...f, price: v ? Number(v) : undefined }))}
+              radius="md"
+              description="Facoltativo. Visibile solo agli admin."
+            />
+          )}
+
           <Textarea
             label="🔒 Nota Admin (visibile solo a te)"
             placeholder="es. Codice cassaforte: 1234, WiFi password..."

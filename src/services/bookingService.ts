@@ -27,6 +27,7 @@ export interface Booking {
   adminNote?: string;          // nota visibile solo all'admin
   adults: number;              // numero adulti
   children: number;            // numero bambini
+  price?: number;              // importo totale della prenotazione (opzionale)
   createdAt?: any;
   createdBy?: string;
   linenAccounted?: boolean;    // Se i kit sono già stati detratti dall'inventario
@@ -61,6 +62,7 @@ export async function fetchUpcomingBookings(): Promise<Booking[]> {
       adminNote: data.adminNote || '',
       adults: data.adults || 0,
       children: data.children || 0,
+      price: data.price ? Number(data.price) : undefined,
       createdAt: data.createdAt,
       createdBy: data.createdBy,
       linenAccounted: data.linenAccounted || false
