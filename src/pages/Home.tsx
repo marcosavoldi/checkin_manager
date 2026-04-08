@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Title, Text, Card, Group, Stack, Paper, ThemeIcon, SimpleGrid, Badge, Button, Box, useComputedColorScheme, Accordion } from '@mantine/core';
 import { IconLogin, IconLogout, IconBed, IconBath, IconAlertCircle, IconArrowRight, IconLayoutGrid } from '@tabler/icons-react';
+import DeadlineWidget from '../components/DeadlineWidget';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { fetchUpcomingBookings, processLinenConsumption, type Booking } from '../services/bookingService';
@@ -133,6 +134,7 @@ export default function Home() {
 
       {isAdmin ? (
         <Stack gap="md">
+          <DeadlineWidget glassStyles={glassStyles} />
           <Accordion variant="separated" radius="24px" multiple={true} defaultValue={[]} styles={{
             item: { 
               border: glassStyles.border, 
