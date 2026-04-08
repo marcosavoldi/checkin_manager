@@ -146,13 +146,13 @@ export default function DeadlineWidget({ glassStyles }: DeadlineWidgetProps) {
                 : 'rgba(253, 126, 20, 0.28)',
             }}
           >
-            <Group justify="space-between" align="flex-start" wrap="nowrap">
-              <Group gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-                <ThemeIcon size={44} radius="12px" color="orange" variant="light">
-                  <IconCalendarStats size={22} />
+            <Stack gap="sm">
+              <Group gap="md" wrap="nowrap">
+                <ThemeIcon size={40} radius="10px" color="orange" variant="light" style={{ flexShrink: 0 }}>
+                  <IconCalendarStats size={20} />
                 </ThemeIcon>
-                <Stack gap={3} style={{ minWidth: 0 }}>
-                  <Group gap="xs" wrap="nowrap">
+                <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+                  <Group gap="xs" wrap="wrap">
                     <Text size="xs" fw={900} tt="uppercase" c="orange.7" lts="0.8px">ROSS1000</Text>
                     <Badge size="xs" color="orange" variant="dot">
                       entro il 5 {today.format('MMMM')}
@@ -167,18 +167,18 @@ export default function DeadlineWidget({ glassStyles }: DeadlineWidgetProps) {
                 </Stack>
               </Group>
               <Button
-                size="xs"
+                size="sm"
                 radius="xl"
                 color="orange"
                 variant="filled"
-                leftSection={<IconCheck size={14} />}
+                fullWidth
+                leftSection={<IconCheck size={15} />}
                 loading={loadingRoss}
                 onClick={handleConfirmRoss}
-                style={{ flexShrink: 0, marginTop: 2 }}
               >
-                Verificato
+                Ho verificato
               </Button>
-            </Group>
+            </Stack>
           </Paper>
         )}
 
@@ -197,13 +197,13 @@ export default function DeadlineWidget({ glassStyles }: DeadlineWidgetProps) {
                 : 'rgba(250, 82, 82, 0.2)',
             }}
           >
-            <Group justify="space-between" align="flex-start" wrap="nowrap">
-              <Group gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-                <ThemeIcon size={44} radius="12px" color="red" variant="light">
-                  <IconReceipt2 size={22} />
+            <Stack gap="sm">
+              <Group gap="md" wrap="nowrap">
+                <ThemeIcon size={40} radius="10px" color="red" variant="light" style={{ flexShrink: 0 }}>
+                  <IconReceipt2 size={20} />
                 </ThemeIcon>
-                <Stack gap={3} style={{ minWidth: 0 }}>
-                  <Group gap="xs" wrap="nowrap">
+                <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+                  <Group gap="xs" wrap="wrap">
                     <Text size="xs" fw={900} tt="uppercase" c="red.7" lts="0.8px">Tassa di Soggiorno</Text>
                     <Badge size="xs" color="red" variant="dot">
                       {quarterLabel[currentQuarter]}
@@ -218,18 +218,18 @@ export default function DeadlineWidget({ glassStyles }: DeadlineWidgetProps) {
                 </Stack>
               </Group>
               <Button
-                size="xs"
+                size="sm"
                 radius="xl"
                 color="red"
                 variant="filled"
-                leftSection={<IconCheck size={14} />}
+                fullWidth
+                leftSection={<IconCheck size={15} />}
                 loading={loadingTax}
                 onClick={handleConfirmTax}
-                style={{ flexShrink: 0, marginTop: 2 }}
               >
-                Verificato
+                Ho verificato
               </Button>
-            </Group>
+            </Stack>
           </Paper>
         )}
       </Stack>
