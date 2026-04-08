@@ -28,12 +28,17 @@ export default function DeadlineWidget({ glassStyles }: DeadlineWidgetProps) {
   const [loadingTax, setLoadingTax] = useState(false);
 
   useEffect(() => {
-    getDeadlineConfirmations().then(data => {
-      setConfirmations({
-        ross1000: data.ross1000LastConfirmed,
-        touristTax: data.touristTaxLastConfirmed,
+    getDeadlineConfirmations()
+      .then(data => {
+        setConfirmations({
+          ross1000: data.ross1000LastConfirmed,
+          touristTax: data.touristTaxLastConfirmed,
+        });
+      })
+      .catch(() => {
+        // Regole Firestore non ancora configurate: mostra le scadenze senza persistenza
+        setConfirmations({});
       });
-    });
   }, []);
 
   if (confirmations === null) return null;
